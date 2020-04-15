@@ -1,3 +1,4 @@
-./node_modules
-./.env
-./.babelrc
+node_modules
+.env
+build/
+.babelrc
