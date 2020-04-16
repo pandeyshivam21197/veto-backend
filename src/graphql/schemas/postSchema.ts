@@ -1,8 +1,12 @@
 import {buildSchema, GraphQLSchema} from 'graphql';
 
 const postSchema: GraphQLSchema = buildSchema(`
+type AuthResponse {
+token: String
+userId: String!
+}
   type Query {
-    hello: String
+    login(email: String!, password: String!): AuthResponse!
   }
 `);
 

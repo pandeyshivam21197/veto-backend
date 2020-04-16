@@ -1,9 +1,29 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended"
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {},
+  "rules": {
+    "no-commented-out-code": true,
+    "no-unused-variable": true,
+    "no-use-of-empty-return-value": false,
+    "quotemark": [
+      true,
+      "single",
+      "jsx-double",
+      "avoid-escape"
     ],
-    "jsRules": {},
-    "rules": {},
-    "rulesDirectory": []
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "always",
+        "singleline": "never"
+      }
+    ],
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "jsx-no-multiline-js": false
+  },
+  "rulesDirectory": []
 }

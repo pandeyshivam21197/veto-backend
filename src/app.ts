@@ -2,9 +2,9 @@ import express from 'express';
 import {config} from 'dotenv';
 // @ts-ignore
 import graphqlHTTP from 'express-graphql';
-import getSchema from './graphql/schemas/getSchema';
+import getSchema from '@Graphql/schemas/getSchema';
 
-import postSchema from './graphql/schemas/postSchema';
+import postSchema from '@Graphql/schemas/postSchema';
 
 import bodyParser from 'body-parser';
 
@@ -31,12 +31,14 @@ app.get(
 );
 
 config();
-const port: number = Number(process.env['PORT']) || 3000;
-const hostname: string = process.env['HOST'] || 'localhost';
+const port: number = Number(process.env.PORT) || 3000;
+const hostname: string = process.env.HOST || 'localhost';
 
 app.listen(port, hostname,  (error: string) => {
     if (error) {
+        // tslint:disable-next-line:no-console
         return console.log(error)
     }
+    // tslint:disable-next-line:no-console
     return console.log(`server is listening on ${port}`)
 });
