@@ -1,9 +1,9 @@
 import {model, Schema, Document} from 'mongoose';
 
 interface IEntity {
-    title: string,
-    requestedAmount: number,
-    availedAmount?: number,
+    title: string;
+    requestedAmount: number;
+    availedAmount?: number;
 }
 export type CampaignRequestModel = Document & {
     creatorId: Schema.Types.ObjectId;
