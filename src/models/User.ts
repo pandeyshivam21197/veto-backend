@@ -4,9 +4,18 @@ export type UserModel = Document & {
     name: string;
     username: string;
     email: string;
+    password: string;
+    location: string;
+    idProofType: string;
+    idProofImageUrl: string;
+    DOB: string;
+    contactNumber: string;
+    rewardPoints?: number;
+    campaignRequestIds?: [Schema.Types.ObjectId];
+    maxDistance?: number;
 };
 
-const campaignRequestSchema: Schema = new Schema({
+const userSchema: Schema = new Schema({
     name: {
         type: String,
         require: true,
@@ -39,16 +48,25 @@ const campaignRequestSchema: Schema = new Schema({
         type: String,
         required: true,
     },
-    rewardPoints: {
+    contactNumber: {
         type: String,
+        required: true,
+    },
+    rewardPoints: {
+        type: Number,
         default: 0,
     },
-    campaignRequests: {
-        type: String,
+    campaignRequestIds: {
+        type: [Schema.Types.ObjectId],
+        ref: 'Request',
         default: [],
     },
-});
+    maxDistance: {
+        type: Number,
+        default: 0,
+    },
+}, {timestamps: true});
 
-const CampaignRequest = model<UserModel>('CampaignRequest', campaignRequestSchema);
+const User = model<UserModel>('User', userSchema);
 
-export default CampaignRequest;
+export default User;

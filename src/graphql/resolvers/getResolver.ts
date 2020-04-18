@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import {userErrors, error} from '@Utils/errorUtil';
-import User, {UserModel} from '@Models/user';
+import User, {UserModel} from '@Models/User';
 
 const login = async ({email, password}: { email: string, password: string }) => {
     const user: UserModel | null = await User.findOne({email});
