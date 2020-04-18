@@ -5,26 +5,30 @@ interface IEntity {
     requestedAmount: number;
     availedAmount?: number;
 }
+
 export type CampaignRequestModel = Document & {
-    creatorId: Schema.Types.ObjectId;
-    supporterIds?: [Schema.Types.ObjectId];
     title: string;
     subTitle?: string;
     entities?: [IEntity];
     status?: string,
 };
 
-const campaignRequestSchema: Schema = new Schema({
-    creatorId: {
-        type: Schema.Types.ObjectId, // Using token userId is extracted
-        ref: 'User',
+const entity = {
+    title: {
+        type: String,
         required: true,
     },
-    supporterIds: {
-        type: [Schema.Types.ObjectId],
-        ref: 'User',
-        default: [],
+    requestedAmount: {
+        type: Number,
+        required: true,
     },
+    availedAmount: {
+        type: Number,
+        default: 0,
+    },
+};
+
+const campaignRequestSchema: Schema = new Schema({
     title: {
         type: String,
         required: true,
@@ -34,22 +38,7 @@ const campaignRequestSchema: Schema = new Schema({
         default: '',
     },
     entities: {
-        type: [
-            {
-                title: {
-                    type: String,
-                    required: true,
-                },
-                requestedAmount: {
-                    type: Number,
-                    required: true,
-                },
-                availedAmount: {
-                    type: Number,
-                    default: 0,
-                },
-            },
-        ],
+        type: [entity],
         default: [],
     },
     status: {

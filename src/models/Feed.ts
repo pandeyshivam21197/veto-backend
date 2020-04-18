@@ -13,6 +13,17 @@ export type FeedModel = Document & {
     thumbnails?: [IThumbnail]
 };
 
+const thumbnail = {
+    url: {
+        type: String,
+        required: true,
+    },
+    type: {
+        type: String,
+        required: true,
+    },
+};
+
 const feedSchema = new Schema({
     title: {
         type: String,
@@ -31,18 +42,7 @@ const feedSchema = new Schema({
         default: [],
     },
     thumbnails: {
-        type: [
-            {
-                url: {
-                    type: String,
-                    required: true,
-                },
-                type: {
-                    type: String,
-                    required: true,
-                },
-            },
-        ],
+        type: [thumbnail],
         default: [],
     },
 }, {timestamps: true});

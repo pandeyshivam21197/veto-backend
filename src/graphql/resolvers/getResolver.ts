@@ -9,7 +9,7 @@ interface ILoginResponse {
 }
 
 const login = async ({email, password}: { email: string, password: string }): Promise<ILoginResponse | void> => {
-    const user: UserModel | null = await User.findOne({email});
+    const user: UserModel | null = await User.findOne({email} || {username: email});
     if (!user) {
         error(userErrors.USER_NOT_FOUND, 401);
         return;
@@ -20,6 +20,7 @@ const login = async ({email, password}: { email: string, password: string }): Pr
         return;
     }
     const secretKey: string | undefined = process.env.JWT_SECRET;
+    const tokenExpiry: string | undefined = process.env.TOKEN_EXPIRY;
 
     if (!secretKey) {
         error(userErrors.SECRET_KEY_ERROR, 500);
@@ -31,10 +32,10 @@ const login = async ({email, password}: { email: string, password: string }): Pr
             email: user.email,
         },
         secretKey,
-        {expiresIn: '1h'},
+        {expiresIn: tokenExpiry || '1d'},
     );
     return {token, userId: user._id.toString()};
-}
+};
 
 module.exports = {
     login,

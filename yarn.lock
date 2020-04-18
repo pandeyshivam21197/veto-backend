@@ -1883,6 +1883,11 @@ ignore-by-default@^1.0.1:
   resolved "https://registry.yarnpkg.com/ignore-by-default/-/ignore-by-default-1.0.1.tgz#48ca6d72f6c6a3af00a9ad4ae6876be3889e2b09"
   integrity sha1-SMptcvbGo68Aqa1K5odr44ieKwk=
 
+immutable@^3.8.2:
+  version "3.8.2"
+  resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.8.2.tgz#c2439951455bb39913daf281376f1530e104adf3"
+  integrity sha1-wkOZUUVbs5kT2vKBN28VMOEErfM=
+
 import-lazy@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/import-lazy/-/import-lazy-2.1.0.tgz#05698e3d45c88e8d7e9d92cb0584e77f096f3e43"
@@ -2340,6 +2345,11 @@ media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
   integrity sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=
+
+memoize-decorator@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/memoize-decorator/-/memoize-decorator-1.0.2.tgz#605a41715c4171db192a90098b00ab8d6e1102f5"
+  integrity sha1-YFpBcVxBcdsZKpAJiwCrjW4RAvU=
 
 memory-pager@^1.0.2:
   version "1.5.0"
@@ -3293,10 +3303,37 @@ tsconfig-paths@^3.9.0:
     minimist "^1.2.0"
     strip-bom "^3.0.0"
 
-tslib@^1.10.0, tslib@^1.8.1:
+tslib@^1.10.0, tslib@^1.7.1, tslib@^1.8.1:
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.11.1.tgz#eb15d128827fbee2841549e171f45ed338ac7e35"
   integrity sha512-aZW88SY8kQbU7gpV19lN24LtXh/yD4ZZg6qieAJDDg+YBsJcSmLGK9QpnUjAKVG/xefmvJGd1WUmfpT/g6AJGA==
+
+tslint-clean-code@^0.2.10:
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/tslint-clean-code/-/tslint-clean-code-0.2.10.tgz#eaba79fb92d52bebf5ee1177054f056b2233fafa"
+  integrity sha512-MjfU3TVDB+oidhI/uAN/p0ncaqFnPq4L6nYtPvNp/MaFxM52jYtgx1qxf+uTIaQ7KZWZB/P9CpbL7/8WWSzQJg==
+  dependencies:
+    memoize-decorator "^1.0.2"
+    tsutils "2.7.1"
+
+tslint-config-security@^1.16.0:
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/tslint-config-security/-/tslint-config-security-1.16.0.tgz#a561fdf1fccc3986f78c2a12f1c1f5e0b50f6476"
+  integrity sha512-wwM+COg4FX1Gl6VnvaTV9zqcUY6cs4XkiP6T3qhc6s20Xy4J9irui6+fkP07yVkrwfcNFneji3YcIwiMvKSQPQ==
+  dependencies:
+    safe-regex "^1.1.0"
+
+tslint-no-circular-imports@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/tslint-no-circular-imports/-/tslint-no-circular-imports-0.7.0.tgz#9df0a15654d66b172e0b7843eed073fa5ae99b5f"
+  integrity sha512-k3wxpeMC4ef40UbpfBVHEHIzKfNZq5/SCtAO1YjGsaNTklo+K53/TWLrym+poA65RJFDiYgYNWvkeIIkJNA0Vw==
+
+tslint-sonarts@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/tslint-sonarts/-/tslint-sonarts-1.9.0.tgz#feb593e92db328c0328b430b838adbe65d504de9"
+  integrity sha512-CJWt+IiYI8qggb2O/JPkS6CkC5DY1IcqRsm9EHJ+AxoWK70lvtP7jguochyNDMP2vIz/giGdWCfEM39x/I/Vnw==
+  dependencies:
+    immutable "^3.8.2"
 
 tslint@^6.1.1:
   version "6.1.1"
@@ -3316,6 +3353,13 @@ tslint@^6.1.1:
     semver "^5.3.0"
     tslib "^1.10.0"
     tsutils "^2.29.0"
+
+tsutils@2.7.1:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.7.1.tgz#411a0e9466525a2b2869260a55620d7292155e24"
+  integrity sha1-QRoOlGZSWisoaSYKVWINcpIVXiQ=
+  dependencies:
+    tslib "^1.7.1"
 
 tsutils@^2.29.0:
   version "2.29.0"

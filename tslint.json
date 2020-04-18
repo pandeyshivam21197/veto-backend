@@ -1,7 +1,11 @@
 {
   "defaultSeverity": "error",
   "extends": [
-    "tslint:recommended"
+    "tslint-clean-code",
+    "tslint:recommended",
+    "tslint-no-circular-imports",
+    "tslint-config-security",
+    "tslint-sonarts"
   ],
   "jsRules": {},
   "rules": {
