@@ -1,11 +1,11 @@
 import {buildSchema, GraphQLSchema} from 'graphql';
-import inputs from '@Graphql/inputs';
-import responses from '@Graphql/responses';
+import inputTypes from '@Graphql/inputTypes';
+import responseTypes from '@Graphql/responseTypes';
 import {entity} from '@Graphql/./commonTypes';
 
 
-const {userInput, requestInput, entityInput} = inputs;
-const {CampaignRequest, User} = responses;
+const {userInput, requestInput, entityInput} = inputTypes;
+const {CampaignRequest, User} = responseTypes;
 
 // post Schema - create the data and post to data base (POST, PUT , DELETE, PATCH)
 const postSchema: GraphQLSchema = buildSchema(`

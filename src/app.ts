@@ -2,9 +2,12 @@ import express, {Request, Response, NextFunction, ErrorRequestHandler} from 'exp
 import {config} from 'dotenv';
 // @ts-ignore
 import graphqlHTTP from 'express-graphql';
-import getSchema from '@Graphql/schemas/getSchema';
 
+import getSchema from '@Graphql/schemas/getSchema';
 import postSchema from '@Graphql/schemas/postSchema';
+
+import getResolver from '@Graphql/resolvers/getResolver'
+import postResolver from '@Graphql/resolvers/postResolver'
 
 import bodyParser from 'body-parser';
 import Auth from './middlewares/Auth';
@@ -30,6 +33,7 @@ app.post(
     '/graphql',
     graphqlHTTP({
         schema: postSchema,
+        rootValue: getResolver,
         graphiql: false,
     }),
 );
@@ -39,6 +43,7 @@ app.get(
     '/graphql',
     graphqlHTTP({
         schema: getSchema,
+        rootValue: getResolver,
         graphiql: true,
     }),
 );

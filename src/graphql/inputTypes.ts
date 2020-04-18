@@ -30,6 +30,6 @@ input requestInput {
 }
 `;
 
-const inputs = {userInput, requestInput, entityInput};
+const inputTypes = {userInput, requestInput, entityInput};
 
-export default inputs;
+export default inputTypes;

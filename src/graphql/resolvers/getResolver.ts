@@ -37,6 +37,6 @@ const login = async ({email, password}: { email: string, password: string }): Pr
     return {token, userId: user._id.toString()};
 };
 
-module.exports = {
-    login,
-};
+const getResolver = {login};
+
+export default getResolver;

@@ -33,6 +33,6 @@ name: String!
 }
 `;
 
-const responses = {User, CampaignRequest};
+const responseTypes = {User, CampaignRequest};
 
-export default responses;
+export default responseTypes;
