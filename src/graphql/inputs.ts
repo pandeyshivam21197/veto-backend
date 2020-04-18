@@ -1,6 +1,8 @@
+import {entity} from '@Graphql/./commonTypes';
+
 const userInput: string = `
 input userInput {
-name: String!
+    name: String!
     username: String!
     email: String!
     password: String!
@@ -11,6 +13,23 @@ name: String!
 }
 `;
 
-const inputs = {userInput};
+const entityInput: string = `
+input entityInput {
+    title: String!
+    requestedAmount: Int!
+    availedAmount: Int
+    }
+`;
+
+// require entity
+const requestInput: string = `
+input requestInput {
+    title: String!
+    subTitle: String
+    entities: [entity]
+}
+`;
+
+const inputs = {userInput, requestInput, entityInput};
 
 export default inputs;

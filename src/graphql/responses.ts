@@ -1,12 +1,20 @@
+const timeStamp: string = `
+    createdAt: String!
+    updatedAt: String!
+`;
+
+// Requires entity
 const CampaignRequest: string = `
 type CampaignRequest {
-    title: string
-    subTitle?: string
-    entities?: [IEntity]
-    status?: string
+    title: String!
+    subTitle: String
+    entities: [entity]
+    status: String
+    ${timeStamp}
     }
 `;
 
+// Requires CampaignRequest
 const User: string = `
 type User {
 name: String!
@@ -18,9 +26,10 @@ name: String!
     idProofImageUrl: String!
     DOB: String!
     contactNumber: String!
-    rewardPoints?: Number
-    campaignRequestIds?: [${CampaignRequest}]
-    maxDistance?: Number
+    rewardPoints: Int
+    campaignRequestIds: [CampaignRequest]!
+    maxDistance: Int
+    ${timeStamp}
 }
 `;
 
