@@ -1,6 +1,6 @@
 import {model, Schema, Document} from 'mongoose';
 
-interface IEntity {
+export interface IEntity {
     title: string;
     requestedAmount: number;
     availedAmount?: number;

@@ -1,5 +1,3 @@
-import {entity} from '@Graphql/./commonTypes';
-
 const userInput: string = `
 input userInput {
     name: String!
