@@ -5,8 +5,6 @@
   ],
   "jsRules": {},
   "rules": {
-    "no-commented-out-code": true,
-    "no-unused-variable": true,
     "no-use-of-empty-return-value": false,
     "quotemark": [
       true,
