@@ -1,6 +1,7 @@
 export const userErrors = {
     USER_NOT_FOUND: 'User not found',
     INCORRECT_PASSWORD: 'Password is incorrect.',
+    SECRET_KEY_ERROR: 'Secret key not found',
 };
 
 interface ErrorType extends Error{

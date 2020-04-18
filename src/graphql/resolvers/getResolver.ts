@@ -3,23 +3,34 @@ import jwt from 'jsonwebtoken';
 import {userErrors, error} from '@Utils/errorUtil';
 import User, {UserModel} from '@Models/User';
 
-const login = async ({email, password}: { email: string, password: string }) => {
+interface ILoginResponse {
+    token: string;
+    userId: string;
+}
+
+const login = async ({email, password}: { email: string, password: string }): Promise<ILoginResponse | void> => {
     const user: UserModel | null = await User.findOne({email});
     if (!user) {
-        error(userErrors.USER_NOT_FOUND, 401)
+        error(userErrors.USER_NOT_FOUND, 401);
         return;
     }
-    const isEqual = await bcrypt.compare(password, user.password);
+    const isEqual: boolean = await bcrypt.compare(password, user.password);
     if (!isEqual) {
         error(userErrors.INCORRECT_PASSWORD, 401);
         return;
     }
-    const token = jwt.sign(
+    const secretKey: string | undefined = process.env.JWT_SECRET;
+
+    if (!secretKey) {
+        error(userErrors.SECRET_KEY_ERROR, 500);
+        return;
+    }
+    const token: string = jwt.sign(
         {
             userId: user._id.toString(),
             email: user.email,
         },
-        'superSecret',
+        secretKey,
         {expiresIn: '1h'},
     );
     return {token, userId: user._id.toString()};
