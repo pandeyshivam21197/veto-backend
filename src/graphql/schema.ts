@@ -5,13 +5,14 @@ import {buildSchema, GraphQLSchema} from 'graphql';
 
 
 const {userInput, requestInput, entityInput} = inputTypes;
-const {CampaignRequest, User} = responseTypes;
+const {CampaignRequest, User, DonationHistory} = responseTypes;
 
 // post Schema - create the data and post to data base (POST, PUT , DELETE, PATCH)
 const source = `
 ${entity}
 ${userInput}
 ${CampaignRequest}
+${DonationHistory}
 ${User}
 ${entityInput}
 ${requestInput}

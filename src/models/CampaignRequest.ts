@@ -4,6 +4,7 @@ export interface IEntity {
     title: string;
     requestedAmount: number;
     availedAmount?: number;
+    currentPrice: string;
 }
 
 export type CampaignRequestModel = Document & {
@@ -27,6 +28,10 @@ const entity = {
     availedAmount: {
         type: Number,
         default: 0,
+    },
+    currentPrice: {
+        type: String,
+        required: true,
     },
 };
 

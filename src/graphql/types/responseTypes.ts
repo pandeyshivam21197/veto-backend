@@ -3,6 +3,13 @@ const timeStamp: string = `
     updatedAt: String!
 `;
 
+const DonationHistory: string = `
+type DonationHistory {
+    campaignRequestIds: CampaignRequest!
+    donationAmount: String!
+}
+`;
+
 // Requires entity Type
 const CampaignRequest: string = `
 type CampaignRequest {
@@ -15,7 +22,7 @@ type CampaignRequest {
     }
 `;
 
-// Requires CampaignRequest Type
+// Requires CampaignRequest Type and Donation History Type
 const User: string = `
 type User {
     _id: ID!
@@ -30,11 +37,12 @@ type User {
     contactNumber: String!
     rewardPoints: Int!
     campaignRequestIds: [CampaignRequest]!
+    donationHistory: [DonationHistory]!
     maxDistance: Int!
     ${timeStamp}
 }
 `;
 
-const responseTypes = {User, CampaignRequest};
+const responseTypes = {User, CampaignRequest, DonationHistory};
 
 export default responseTypes;

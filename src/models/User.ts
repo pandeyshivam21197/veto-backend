@@ -1,5 +1,9 @@
 import {Document, model, Schema} from 'mongoose';
 
+interface IDonationHistory {
+    requestId: Schema.Types.ObjectId;
+    donationAmount: string;
+}
 export type UserModel = Document & {
     name: string;
     username: string;
@@ -12,9 +16,16 @@ export type UserModel = Document & {
     contactNumber: string;
     rewardPoints?: number;
     campaignRequestIds?: [Schema.Types.ObjectId];
+    donationHistory?: IDonationHistory[];
     maxDistance?: number;
     createdAt: string;
     updatedAt: string;
+};
+
+const donationHistory = {
+    campaignRequestId: Schema.Types.ObjectId,
+    ref: 'CampaignRequest',
+    donationAmount: String,
 };
 
 const userSchema: Schema = new Schema({
@@ -60,7 +71,11 @@ const userSchema: Schema = new Schema({
     },
     campaignRequestIds: {
         type: [Schema.Types.ObjectId],
-        ref: 'Request',
+        ref: 'CampaignRequest',
+        default: [],
+    },
+    donationHistory: {
+        type: [donationHistory],
         default: [],
     },
     maxDistance: {
