@@ -101,6 +101,7 @@ const postCampaign = async ({requestInput}: { requestInput: CampaignRequestModel
         const {createdAt, updatedAt, _id} = createdRequest;
 
         return {
+            // @ts-ignore
             ...createdRequest._doc,
             createdAt: createdAt.toString(),
             updatedAt: updatedAt.toString(),
@@ -124,6 +125,7 @@ const postCampaignEntity =
             const {createdAt, updatedAt, _id} = updatedCampaign;
 
             return {
+                // @ts-ignore
                 ...updatedCampaign._doc,
                 createdAt: createdAt.toString(),
                 updatedAt: updatedAt.toString(),
