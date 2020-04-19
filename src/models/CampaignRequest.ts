@@ -9,7 +9,7 @@ export interface IEntity {
 export type CampaignRequestModel = Document & {
     title: string;
     subTitle?: string;
-    entities?: [IEntity];
+    entities?: IEntity[];
     status?: string,
     createdAt: string;
     updatedAt: string;

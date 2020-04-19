@@ -6,6 +6,7 @@ input userInput {
     password: String!
     location: String!
     idProofType: String!
+    contactNumber: String!
     idProofImageUrl: String!
     DOB: String!
 }

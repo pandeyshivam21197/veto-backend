@@ -6,7 +6,7 @@ import {CampaignRequestModel, IEntity} from '@Models/CampaignRequest';
 import {error, userErrors} from '@Utils/errorUtil';
 import jwt from 'jsonwebtoken';
 import {Types} from 'mongoose';
-import {isEntitiesValid} from '@Utils/resolverUtil';
+import {getEntities, isEntitiesValid} from '@Utils/resolverUtil';
 
 interface ILoginResponse {
     token: string;
@@ -87,15 +87,8 @@ const login = async ({loginInput}: { loginInput: LoginInput }): Promise<ILoginRe
 const postCampaign = async ({requestInput}: { requestInput: CampaignRequestModel }, req: Request) => {
     try {
         const {title, subTitle, entities} = requestInput;
-        const data: [any] = [title];
-        if (subTitle) {
-            data.push(subTitle);
-        }
-        if (entities) {
-            data.push(entities)
-        }
 
-        const request = new CampaignRequest({...data});
+        const request = new CampaignRequest({title, subTitle, entities});
         const createdRequest = await request.save();
 
         const {createdAt, updatedAt, _id} = createdRequest;
@@ -112,7 +105,7 @@ const postCampaign = async ({requestInput}: { requestInput: CampaignRequestModel
     }
 };
 const postCampaignEntity =
-    async ({entityInput, campaignRequestId}: { entityInput: [IEntity], campaignRequestId: string }, req: Request) => {
+    async ({entityInput, campaignRequestId}: { entityInput: IEntity[], campaignRequestId: string }, req: Request) => {
         const campaign: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
         if (!campaign) {
             const {BAD_REQUEST, REQUEST_NOT_FOUND} = userErrors;
@@ -120,7 +113,15 @@ const postCampaignEntity =
             return;
         }
         if(isEntitiesValid(entityInput)) {
-            campaign.entities = {...campaign.entities, ...entityInput};
+            const {entities} = campaign;
+            let newEntities = [];
+            if(entities && entities.length > 0) {
+                newEntities = getEntities(entities ,entityInput)
+            } else {
+                newEntities.push(...entityInput);
+            }
+
+            campaign.entities = newEntities;
             const updatedCampaign = await campaign.save();
             const {createdAt, updatedAt, _id} = updatedCampaign;
 
