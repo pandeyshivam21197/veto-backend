@@ -3,14 +3,8 @@ import CampaignRequest, {IDonationEntity} from '@Models/CampaignRequest';
 import {CampaignRequestModel, IEntity} from '@Models/CampaignRequest';
 import User, {UserModel} from '@Models/User';
 import {error, IMessage, throwCampaignNotFoundError, throwUserNotFoundError, userErrors} from '@Utils/errorUtil';
-import {
-    decreaseCampaignEnityAmount,
-    decreaseCampaignEntityAmount,
-    getEntities,
-    isEntitiesValid, updateEntityAmount
-} from '@Utils/resolverUtil';
+import {getEntities, isEntitiesValid, updateEntityAmount} from '@Utils/resolverUtil';
 import bcrypt from 'bcryptjs';
-import {Request} from 'express';
 import jwt from 'jsonwebtoken';
 import {Types} from 'mongoose';
 import validator from 'validator';
@@ -25,9 +19,7 @@ interface LoginInput {
     password: string;
 }
 
-// TODO: add return type of all
-
-const singIn = async ({userInput}: { userInput: UserModel }, req: Request): Promise<UserModel | undefined> => {
+const singIn = async ({userInput}: { userInput: UserModel }): Promise<UserModel | undefined> => {
     try {
         const {username, name, password, email, location, idProofImageUrl, idProofType, DOB, contactNumber} = userInput;
         const encodedPassword = await bcrypt.hash(password, 12);
@@ -202,6 +194,7 @@ const postCampaignDonation = async ({campaignRequestId, entity}: { campaignReque
                         donationAmount: amount,
                     }];
                 }
+                user.rewardPoints = user.rewardPoints + 1;
                 await user.save();
             }
             // Decrease Campaign entity amount

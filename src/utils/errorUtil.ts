@@ -1,5 +1,5 @@
-import User, {UserModel} from "@Models/User";
-import {CampaignRequestModel} from "@Models/CampaignRequest";
+import {CampaignRequestModel} from '@Models/CampaignRequest';
+import User, {UserModel} from '@Models/User';
 
 export const userErrors = {
     USER_NOT_FOUND: 'User not found.',

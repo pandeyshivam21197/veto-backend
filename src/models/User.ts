@@ -15,10 +15,10 @@ export type UserModel = Document & {
     idProofImageUrl: string;
     DOB: string;
     contactNumber: string;
-    rewardPoints?: number;
-    campaignRequestIds?: [Types.ObjectId];
-    donationHistory?: IDonationHistory[];
-    maxDistance?: number;
+    rewardPoints: number;
+    campaignRequestIds: [Types.ObjectId];
+    donationHistory: IDonationHistory[];
+    maxDistance: number;
     createdAt: string;
     updatedAt: string;
 };
