@@ -3,12 +3,13 @@ import responseTypes from '@Graphql/types/responseTypes';
 import {buildSchema, GraphQLSchema} from 'graphql';
 
 const {userInput, requestInput, entityInput, donationEntityInput} = inputTypes;
-const {CampaignRequest, User, DonationHistory, entity} = responseTypes;
+const {CampaignRequest, User, DonationHistory, entity, Thumbnails} = responseTypes;
 
 // post Schema - create the data and post to data base (POST, PUT , DELETE, PATCH)
 const source = `
 ${entity}
 ${userInput}
+${Thumbnails}
 ${CampaignRequest}
 ${DonationHistory}
 ${User}
@@ -33,6 +34,7 @@ password: String!
     postCampaignEntity(campaignRequestId: String!, entityInput: [entityInput]!): CampaignRequest!
     postCampaignDonation(campaignRequestId: String!, entity: DonationEntityInput!): CampaignRequest!
     postUserRewards(points: Int!): User!
+    postCampaignThumbnails(campaignRequestId: String!, thumbnails: Thumbnails): CampaignRequest!
     }
 
     type RootQuery {

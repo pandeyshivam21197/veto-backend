@@ -1,4 +1,5 @@
 import {entityStatus, IDonationEntity, IEntity} from '@Models/CampaignRequest';
+import {imageTypes, IThumbnail, thumbnailType} from '@Models/Feed';
 import {campaignRequestError, error} from '@Utils/errorUtil';
 
 export const isEntitiesValid = (entities: IEntity[]): boolean => {
@@ -41,4 +42,16 @@ export const updateEntityAmount = (donationEntity: IDonationEntity, entities: IE
         entities.splice(foundIndex, 1, updatedEntity);
     }
     return entities;
-}
+};
+
+export const setThumbnailsType = (oldThumbnails: IThumbnail[], newThumbnails: IThumbnail[]): IThumbnail[] => {
+    newThumbnails.forEach((thumbnail: IThumbnail) => {
+        const type = thumbnail.url.split('.').pop();
+        if(type && imageTypes.includes(type.trim().toLowerCase())) {
+            thumbnail.type = thumbnailType.IMAGE;
+        } else {
+            thumbnail.type = thumbnailType.VIDEO;
+        }
+    });
+    return [...oldThumbnails, ...newThumbnails];
+};

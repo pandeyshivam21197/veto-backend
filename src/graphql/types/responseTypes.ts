@@ -21,6 +21,12 @@ type entity {
     }
 `;
 
+const Thumbnails: string = `
+type Thumbnails {
+    url: String!
+    type: String!
+    }
+`;
 
 // Requires entity Type and User Type
 const CampaignRequest: string = `
@@ -31,6 +37,7 @@ type CampaignRequest {
     entities: [entity]!
     status: String!
     donerIds: [User]!
+    thumbnails: [Thumbnails]!
     ${timeStamp}
     }
 `;
@@ -56,6 +63,6 @@ type User {
 }
 `;
 
-const responseTypes = {User, CampaignRequest, DonationHistory, entity};
+const responseTypes = {User, CampaignRequest, DonationHistory, entity, Thumbnails};
 
 export default responseTypes;

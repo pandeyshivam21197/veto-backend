@@ -1,3 +1,4 @@
+import {IThumbnail, thumbnail} from '@Models/Feed';
 import {Document, model, Schema, Types} from 'mongoose';
 
 export interface IEntity {
@@ -20,11 +21,16 @@ export type CampaignRequestModel = Document & {
     status: string,
     createdAt: string;
     updatedAt: string;
-    donerIds: [Types.ObjectId];
+    donerIds: Types.ObjectId[];
+    thumbnails: IThumbnail[];
 };
 
 export const entityStatus = {
     AVAILED: 'Availed',
+};
+
+export const campaignRequestStatus = {
+    COMPLETED: 'Completed',
 };
 
 const entity = {
@@ -70,6 +76,10 @@ const campaignRequestSchema: Schema = new Schema({
     donerIds: {
         type: [Schema.Types.ObjectId],
         ref: 'User',
+        default: [],
+    },
+    thumbnails: {
+        type: [thumbnail],
         default: [],
     },
 }, {timestamps: true});

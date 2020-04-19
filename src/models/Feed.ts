@@ -1,26 +1,33 @@
 import {Document, model, Schema, Types} from 'mongoose';
 
-interface IThumbnail {
+export interface IThumbnail {
     url: string;
     type: string;
 }
 
 export type FeedModel = Document & {
     title: string;
-    description?: string;
+    description: string;
     creatorId: Types.ObjectId;
-    supporterIds?: [Types.ObjectId];
-    thumbnails?: [IThumbnail]
+    supporterIds: [Types.ObjectId];
+    thumbnails: IThumbnail[];
 };
 
-const thumbnail = {
+export const imageTypes = ['jpeg', 'jpg', 'png', 'gif', 'tiff'];
+
+export const thumbnailType = {
+    IMAGE: 'Image',
+    VIDEO: 'Video',
+}
+
+export const thumbnail = {
     url: {
         type: String,
         required: true,
     },
     type: {
         type: String,
-        required: true,
+        default: '',
     },
 };
 

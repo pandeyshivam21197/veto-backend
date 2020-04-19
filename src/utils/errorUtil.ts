@@ -1,3 +1,4 @@
+import {IRequest} from '@Middleware/Auth';
 import {CampaignRequestModel} from '@Models/CampaignRequest';
 import User, {UserModel} from '@Models/User';
 
@@ -16,7 +17,7 @@ export const campaignRequestError = {
     BAD_REQUEST: 'Unable to set, please check params',
 }
 
-export interface ErrorType extends Error{
+export interface ErrorType extends Error {
     code?: number,
     data?: IMessage[] | IMessage
 }
@@ -28,13 +29,13 @@ export interface IMessage {
 export const error = (message: string, code = 500, data?: IMessage[] | IMessage): void => {
     const err: ErrorType = new Error(message);
     err.code = code;
-    if(data) {
+    if (data) {
         err.data = data;
     }
     throw err;
 };
 
-export const throwUserNotFoundError = (user: UserModel | null) => {
+export const throwUserNotFoundError = (user: UserModel | null): void => {
     if (!user) {
         const {USER_NOT_FOUND} = userErrors;
         error(USER_NOT_FOUND, 401);
@@ -42,10 +43,17 @@ export const throwUserNotFoundError = (user: UserModel | null) => {
     }
 }
 
-export const throwCampaignNotFoundError = (campaign: CampaignRequestModel | null) => {
+export const throwCampaignNotFoundError = (campaign: CampaignRequestModel | null): void => {
     if (!campaign) {
         const {BAD_REQUEST, REQUEST_NOT_FOUND} = userErrors;
         error(BAD_REQUEST + REQUEST_NOT_FOUND, 400, {message: 'wrong campaignRequestId'});
         return;
+    }
+};
+
+export const throwUserNotAuthorized = (req: IRequest): void => {
+    const {isAuth} = req;
+    if (!isAuth) {
+        error(userErrors.USR_NOT_AUTHORIZED, 401);
     }
 };
