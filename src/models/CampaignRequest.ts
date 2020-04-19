@@ -3,18 +3,28 @@ import {Document, model, Schema, Types} from 'mongoose';
 export interface IEntity {
     title: string;
     requestedAmount: number;
-    availedAmount?: number;
+    availedAmount: number;
     currentPrice: string;
+    status: string;
+}
+
+export interface IDonationEntity {
+    title: string;
+    amount: number;
 }
 
 export type CampaignRequestModel = Document & {
     title: string;
-    subTitle?: string;
-    entities?: IEntity[];
-    status?: string,
+    subTitle: string;
+    entities: IEntity[];
+    status: string,
     createdAt: string;
     updatedAt: string;
-    donerIds?: [Types.ObjectId];
+    donerIds: [Types.ObjectId];
+};
+
+export const entityStatus = {
+    AVAILED: 'Availed',
 };
 
 const entity = {
@@ -33,6 +43,10 @@ const entity = {
     currentPrice: {
         type: String,
         required: true,
+    },
+    status: {
+        type: String,
+        default: '',
     },
 };
 

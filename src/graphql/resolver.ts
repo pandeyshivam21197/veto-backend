@@ -1,9 +1,14 @@
 import {IRequest} from '@Middleware/Auth';
-import CampaignRequest from '@Models/CampaignRequest';
+import CampaignRequest, {IDonationEntity} from '@Models/CampaignRequest';
 import {CampaignRequestModel, IEntity} from '@Models/CampaignRequest';
 import User, {UserModel} from '@Models/User';
-import {error, IMessage, throwUserNotFoundError, userErrors} from '@Utils/errorUtil';
-import {getEntities, isEntitiesValid} from '@Utils/resolverUtil';
+import {error, IMessage, throwCampaignNotFoundError, throwUserNotFoundError, userErrors} from '@Utils/errorUtil';
+import {
+    decreaseCampaignEnityAmount,
+    decreaseCampaignEntityAmount,
+    getEntities,
+    isEntitiesValid, updateEntityAmount
+} from '@Utils/resolverUtil';
 import bcrypt from 'bcryptjs';
 import {Request} from 'express';
 import jwt from 'jsonwebtoken';
@@ -104,7 +109,7 @@ const login = async ({loginInput}: { loginInput: LoginInput }): Promise<ILoginRe
 
 const postCampaign = async ({requestInput}: { requestInput: CampaignRequestModel }, req: IRequest): Promise<CampaignRequestModel | undefined> => {
     try {
-        const {isAuth} = req;
+        const {isAuth, userId} = req;
         if (isAuth) {
             const {title, subTitle, entities} = requestInput;
 
@@ -112,6 +117,16 @@ const postCampaign = async ({requestInput}: { requestInput: CampaignRequestModel
             const createdRequest = await request.save();
 
             const {createdAt, updatedAt, _id} = createdRequest;
+
+            const user: UserModel | null = await User.findOne({_id: userId});
+            throwUserNotFoundError(user);
+            if (user) {
+                if (user.campaignRequestIds) {
+                    user.campaignRequestIds.push(_id);
+                } else {
+                    user.campaignRequestIds = [_id];
+                }
+            }
 
             return {
                 // @ts-ignore
@@ -132,32 +147,30 @@ const postCampaignEntity =
         try {
             const {isAuth} = req;
             if (isAuth) {
-                const campaign: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
-                if (!campaign) {
-                    const {BAD_REQUEST, REQUEST_NOT_FOUND} = userErrors;
-                    error(BAD_REQUEST + REQUEST_NOT_FOUND, 400, {message: 'wrong campaignRequestId'});
-                    return;
-                }
-                if (isEntitiesValid(entityInput)) {
-                    const {entities} = campaign;
-                    let newEntities = [];
-                    if (entities && entities.length > 0) {
-                        newEntities = getEntities(entities, entityInput)
-                    } else {
-                        newEntities.push(...entityInput);
+                const campaignRequest: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+                throwCampaignNotFoundError(campaignRequest);
+                if (campaignRequest) {
+                    if (isEntitiesValid(entityInput)) {
+                        const {entities} = campaignRequest;
+                        let newEntities = [];
+                        if (entities && entities.length > 0) {
+                            newEntities = getEntities(entities, entityInput)
+                        } else {
+                            newEntities.push(...entityInput);
+                        }
+
+                        campaignRequest.entities = newEntities;
+                        const updatedCampaign = await campaignRequest.save();
+                        const {createdAt, updatedAt, _id} = updatedCampaign;
+
+                        return {
+                            // @ts-ignore
+                            ...updatedCampaign._doc,
+                            createdAt: createdAt.toString(),
+                            updatedAt: updatedAt.toString(),
+                            _id: _id.toString(),
+                        };
                     }
-
-                    campaign.entities = newEntities;
-                    const updatedCampaign = await campaign.save();
-                    const {createdAt, updatedAt, _id} = updatedCampaign;
-
-                    return {
-                        // @ts-ignore
-                        ...updatedCampaign._doc,
-                        createdAt: createdAt.toString(),
-                        updatedAt: updatedAt.toString(),
-                        _id: _id.toString(),
-                    };
                 } else {
                     error(userErrors.BAD_REQUEST, 400, {message: 'Please add valid requestedAmount'});
                 }
@@ -169,12 +182,14 @@ const postCampaignEntity =
         }
     };
 
-const postUserDonation = async ({campaignRequestId, amount}: { campaignRequestId: string, amount: number }, req: IRequest): Promise<UserModel | undefined> => {
+const postCampaignDonation = async ({campaignRequestId, entity}: { campaignRequestId: string, entity: IDonationEntity }, req: IRequest): Promise<CampaignRequestModel | undefined> => {
     try {
         const {isAuth, userId} = req;
         if (isAuth) {
+            const {amount} = entity;
             const user: UserModel | null = await User.findOne({_id: userId});
             throwUserNotFoundError(user);
+            // Set user donation history to a particular Campaign Request
             if (user) {
                 if (user.donationHistory) {
                     user.donationHistory.push({
@@ -187,11 +202,19 @@ const postUserDonation = async ({campaignRequestId, amount}: { campaignRequestId
                         donationAmount: amount,
                     }];
                 }
-                const updatedUser = await user.save();
-                const {createdAt, updatedAt, _id} = updatedUser;
+                await user.save();
+            }
+            // Decrease Campaign entity amount
+            const campaignRequest = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+            throwCampaignNotFoundError(campaignRequest);
+            if (campaignRequest) {
+                campaignRequest.entities = updateEntityAmount(entity, campaignRequest.entities);
+                await campaignRequest.save();
+
+                const {createdAt, updatedAt, _id} = campaignRequest;
                 return {
                     // @ts-ignore
-                    ...updatedUser._doc,
+                    ...campaignRequest._doc,
                     createdAt: createdAt.toString(),
                     updatedAt: updatedAt.toString(),
                     _id: _id.toString(),
@@ -229,6 +252,6 @@ const postUserRewards = async ({points}: { points: number }, req: IRequest): Pro
 };
 
 
-const resolver = {singIn, login, postCampaign, postCampaignEntity, postUserDonation, postUserRewards};
+const resolver = {singIn, login, postCampaign, postCampaignEntity, postCampaignDonation, postUserRewards};
 
 export default resolver;

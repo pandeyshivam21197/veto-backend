@@ -11,14 +11,25 @@ type DonationHistory {
 }
 `;
 
+const entity: string = `
+type entity {
+    title: String!
+    requestedAmount: Int!
+    availedAmount: Int!
+    currentPrice: String!
+    status: String!
+    }
+`;
+
+
 // Requires entity Type and User Type
 const CampaignRequest: string = `
 type CampaignRequest {
      _id: ID!
     title: String!
-    subTitle: String
-    entities: [entity]
-    status: String
+    subTitle: String!
+    entities: [entity]!
+    status: String!
     donerIds: [User]!
     ${timeStamp}
     }
@@ -45,6 +56,6 @@ type User {
 }
 `;
 
-const responseTypes = {User, CampaignRequest, DonationHistory};
+const responseTypes = {User, CampaignRequest, DonationHistory, entity};
 
 export default responseTypes;

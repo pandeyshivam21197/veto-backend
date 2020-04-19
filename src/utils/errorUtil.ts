@@ -1,5 +1,5 @@
 import User, {UserModel} from "@Models/User";
-import {Types} from "mongoose";
+import {CampaignRequestModel} from "@Models/CampaignRequest";
 
 export const userErrors = {
     USER_NOT_FOUND: 'User not found.',
@@ -11,6 +11,10 @@ export const userErrors = {
     INVALID_EMAIL: 'Please provide proper email address',
     INVALID_PASSWORD: 'Please provide password min length of 5',
 };
+
+export const campaignRequestError = {
+    BAD_REQUEST: 'Unable to set, please check params',
+}
 
 export interface ErrorType extends Error{
     code?: number,
@@ -37,3 +41,11 @@ export const throwUserNotFoundError = (user: UserModel | null) => {
         return;
     }
 }
+
+export const throwCampaignNotFoundError = (campaign: CampaignRequestModel | null) => {
+    if (!campaign) {
+        const {BAD_REQUEST, REQUEST_NOT_FOUND} = userErrors;
+        error(BAD_REQUEST + REQUEST_NOT_FOUND, 400, {message: 'wrong campaignRequestId'});
+        return;
+    }
+};

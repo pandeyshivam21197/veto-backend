@@ -1,4 +1,5 @@
-import {IEntity} from '@Models/CampaignRequest';
+import {entityStatus, IDonationEntity, IEntity} from '@Models/CampaignRequest';
+import {campaignRequestError, error} from '@Utils/errorUtil';
 
 export const isEntitiesValid = (entities: IEntity[]): boolean => {
     let isValid: boolean = true;
@@ -22,4 +23,22 @@ export const getEntities = (oldEntities: IEntity[], newEntities: IEntity[]): IEn
         }
     });
     return [...oldEntities, ...newEntities];
+};
+
+export const updateEntityAmount = (donationEntity: IDonationEntity, entities: IEntity[]): IEntity[] => {
+    const {title, amount} = donationEntity;
+    const foundIndex = entities.findIndex((entity: IEntity) => entity.title === title);
+    if(foundIndex > -1) {
+        const foundEntity: IEntity = entities[foundIndex];
+        const {availedAmount, requestedAmount} = foundEntity;
+        if(availedAmount === requestedAmount) {
+            error(campaignRequestError.BAD_REQUEST, 403, {message: 'entity is already availed.'});
+        }
+        const updatedEntity: IEntity = {...foundEntity, availedAmount: availedAmount + amount};
+        if(updatedEntity.availedAmount === updatedEntity.requestedAmount) {
+            updatedEntity.status = entityStatus.AVAILED;
+        }
+        entities.splice(foundIndex, 1, updatedEntity);
+    }
+    return entities;
 }

@@ -1,10 +1,9 @@
-import {entity} from '@Graphql/types/commonTypes';
 import inputTypes from '@Graphql/types/inputTypes';
 import responseTypes from '@Graphql/types/responseTypes';
 import {buildSchema, GraphQLSchema} from 'graphql';
 
-const {userInput, requestInput, entityInput} = inputTypes;
-const {CampaignRequest, User, DonationHistory} = responseTypes;
+const {userInput, requestInput, entityInput, donationEntityInput} = inputTypes;
+const {CampaignRequest, User, DonationHistory, entity} = responseTypes;
 
 // post Schema - create the data and post to data base (POST, PUT , DELETE, PATCH)
 const source = `
@@ -15,6 +14,7 @@ ${DonationHistory}
 ${User}
 ${entityInput}
 ${requestInput}
+${donationEntityInput}
 
 type AuthResponse {
 token: String!
@@ -31,7 +31,7 @@ password: String!
     login(loginInput: loginInput!): AuthResponse!
     postCampaign(requestInput: requestInput!): CampaignRequest!
     postCampaignEntity(campaignRequestId: String!, entityInput: [entityInput]!): CampaignRequest!
-    postUserDonation(campaignRequestId: String!, amount: Int!): User!
+    postCampaignDonation(campaignRequestId: String!, entity: DonationEntityInput!): CampaignRequest!
     postUserRewards(points: Int!): User!
     }
 

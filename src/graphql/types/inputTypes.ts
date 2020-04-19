@@ -29,6 +29,13 @@ input requestInput {
 }
 `;
 
-const inputTypes = {userInput, requestInput, entityInput};
+const donationEntityInput: string = `
+input DonationEntityInput {
+    title: String!
+    amount: Int!
+}
+`;
+
+const inputTypes = {userInput, requestInput, entityInput, donationEntityInput};
 
 export default inputTypes;
