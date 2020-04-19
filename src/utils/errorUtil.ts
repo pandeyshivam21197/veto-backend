@@ -10,7 +10,7 @@ export const userErrors = {
 
 export interface ErrorType extends Error{
     code?: number,
-    data?: [IMessage] | IMessage
+    data?: IMessage[] | IMessage
 }
 
 export interface IMessage {

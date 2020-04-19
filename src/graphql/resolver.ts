@@ -55,6 +55,7 @@ const singIn = async ({userInput}: { userInput: UserModel }, req: Request) => {
         const {createdAt, updatedAt, _id} = createdUser;
 
         return {
+            // @ts-ignore
             ...createdUser._doc,
             createdAt: createdAt.toString,
             updatedAt: updatedAt.toString(),
