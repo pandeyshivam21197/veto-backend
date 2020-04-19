@@ -4,6 +4,8 @@ export const userErrors = {
     SECRET_KEY_ERROR: 'Secret key not found.',
     BAD_REQUEST: 'Bad request.',
     REQUEST_NOT_FOUND: 'Requested data not found. Please check params.',
+    INVALID_EMAIL: 'Please provide proper email address',
+    INVALID_PASSWORD: 'Please provide password min length of 5',
 };
 
 export interface ErrorType extends Error{
@@ -11,11 +13,11 @@ export interface ErrorType extends Error{
     data?: [IMessage] | IMessage
 }
 
-interface IMessage {
+export interface IMessage {
     message: string;
 }
 
-export const error = (message: string, code = 500, data?: [IMessage] | IMessage): void => {
+export const error = (message: string, code = 500, data?: IMessage[] | IMessage): void => {
     const err: ErrorType = new Error(message);
     err.code = code;
     if(data) {

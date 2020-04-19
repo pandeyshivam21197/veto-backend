@@ -3,10 +3,11 @@ import bcrypt from 'bcryptjs';
 import User, {UserModel} from '@Models/User';
 import CampaignRequest from '@Models/CampaignRequest';
 import {CampaignRequestModel, IEntity} from '@Models/CampaignRequest';
-import {error, userErrors} from '@Utils/errorUtil';
+import {error, IMessage, userErrors} from '@Utils/errorUtil';
 import jwt from 'jsonwebtoken';
 import {Types} from 'mongoose';
 import {getEntities, isEntitiesValid} from '@Utils/resolverUtil';
+import validator from 'validator';
 
 interface ILoginResponse {
     token: string;
@@ -22,6 +23,20 @@ const singIn = async ({userInput}: { userInput: UserModel }, req: Request) => {
     try {
         const {username, name, password, email, location, idProofImageUrl, idProofType, DOB, contactNumber} = userInput;
         const encodedPassword = await bcrypt.hash(password, 12);
+        const errors: IMessage[] = [];
+
+        if (!validator.isEmail(email)) {
+            errors.push({message: userErrors.INVALID_EMAIL});
+        }
+        if (!validator.isEmail(email)) {
+            errors.push({message: userErrors.INVALID_EMAIL});
+        }
+        if (validator.isEmpty(password) || !validator.isLength(password, {min: 5})) {
+            errors.push({message: userErrors.INCORRECT_PASSWORD});
+        }
+        if (errors.length > 0) {
+            error(userErrors.BAD_REQUEST, 400, errors);
+        }
 
         const user = new User(
             {
@@ -112,11 +127,11 @@ const postCampaignEntity =
             error(BAD_REQUEST + REQUEST_NOT_FOUND, 400, {message: 'wrong campaignRequestId'});
             return;
         }
-        if(isEntitiesValid(entityInput)) {
+        if (isEntitiesValid(entityInput)) {
             const {entities} = campaign;
             let newEntities = [];
-            if(entities && entities.length > 0) {
-                newEntities = getEntities(entities ,entityInput)
+            if (entities && entities.length > 0) {
+                newEntities = getEntities(entities, entityInput)
             } else {
                 newEntities.push(...entityInput);
             }
