@@ -6,7 +6,7 @@ const timeStamp: string = `
 // require CampaignRequest type
 const DonationHistory: string = `
 type DonationHistory {
-    campaignRequestIds: CampaignRequest!
+    campaignRequestId: CampaignRequest!
     donationAmount: String!
 }
 `;

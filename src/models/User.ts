@@ -1,8 +1,8 @@
-import {Document, model, Schema} from 'mongoose';
+import {Document, model, Schema, Types} from 'mongoose';
 
 interface IDonationHistory {
-    requestId: Schema.Types.ObjectId;
-    donationAmount: string;
+    campaignRequestId: Types.ObjectId;
+    donationAmount: number;
 }
 
 export type UserModel = Document & {
@@ -16,7 +16,7 @@ export type UserModel = Document & {
     DOB: string;
     contactNumber: string;
     rewardPoints?: number;
-    campaignRequestIds?: [Schema.Types.ObjectId];
+    campaignRequestIds?: [Types.ObjectId];
     donationHistory?: IDonationHistory[];
     maxDistance?: number;
     createdAt: string;
@@ -29,7 +29,7 @@ const donationHistory = {
         ref: 'CampaignRequest',
     },
     donationAmount: {
-        type: String,
+        type: Number,
         required: true,
     },
 };

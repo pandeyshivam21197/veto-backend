@@ -3,7 +3,6 @@ import inputTypes from '@Graphql/types/inputTypes';
 import responseTypes from '@Graphql/types/responseTypes';
 import {buildSchema, GraphQLSchema} from 'graphql';
 
-
 const {userInput, requestInput, entityInput} = inputTypes;
 const {CampaignRequest, User, DonationHistory} = responseTypes;
 
@@ -32,6 +31,8 @@ password: String!
     login(loginInput: loginInput!): AuthResponse!
     postCampaign(requestInput: requestInput!): CampaignRequest!
     postCampaignEntity(campaignRequestId: String!, entityInput: [entityInput]!): CampaignRequest!
+    postUserDonation(campaignRequestId: String!, amount: Int!): User!
+    postUserRewards(points: Int!): User!
     }
 
     type RootQuery {

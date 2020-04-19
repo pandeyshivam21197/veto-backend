@@ -1,4 +1,4 @@
-import {Document, model, Schema} from 'mongoose';
+import {Document, model, Schema, Types} from 'mongoose';
 
 interface IThumbnail {
     url: string;
@@ -8,8 +8,8 @@ interface IThumbnail {
 export type FeedModel = Document & {
     title: string;
     description?: string;
-    creatorId: Schema.Types.ObjectId;
-    supporterIds?: [Schema.Types.ObjectId];
+    creatorId: Types.ObjectId;
+    supporterIds?: [Types.ObjectId];
     thumbnails?: [IThumbnail]
 };
 

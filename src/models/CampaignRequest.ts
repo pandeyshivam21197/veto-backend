@@ -1,4 +1,4 @@
-import {Document, model, Schema} from 'mongoose';
+import {Document, model, Schema, Types} from 'mongoose';
 
 export interface IEntity {
     title: string;
@@ -14,7 +14,7 @@ export type CampaignRequestModel = Document & {
     status?: string,
     createdAt: string;
     updatedAt: string;
-    donerIds?: [Schema.Types.ObjectId];
+    donerIds?: [Types.ObjectId];
 };
 
 const entity = {

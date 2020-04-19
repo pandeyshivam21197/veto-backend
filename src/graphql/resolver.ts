@@ -1,7 +1,8 @@
+import {IRequest} from '@Middleware/Auth';
 import CampaignRequest from '@Models/CampaignRequest';
 import {CampaignRequestModel, IEntity} from '@Models/CampaignRequest';
 import User, {UserModel} from '@Models/User';
-import {error, IMessage, userErrors} from '@Utils/errorUtil';
+import {error, IMessage, throwUserNotFoundError, userErrors} from '@Utils/errorUtil';
 import {getEntities, isEntitiesValid} from '@Utils/resolverUtil';
 import bcrypt from 'bcryptjs';
 import {Request} from 'express';
@@ -19,7 +20,9 @@ interface LoginInput {
     password: string;
 }
 
-const singIn = async ({userInput}: { userInput: UserModel }, req: Request) => {
+// TODO: add return type of all
+
+const singIn = async ({userInput}: { userInput: UserModel }, req: Request): Promise<UserModel | undefined> => {
     try {
         const {username, name, password, email, location, idProofImageUrl, idProofType, DOB, contactNumber} = userInput;
         const encodedPassword = await bcrypt.hash(password, 12);
@@ -70,90 +73,162 @@ const login = async ({loginInput}: { loginInput: LoginInput }): Promise<ILoginRe
     try {
         const {email, password} = loginInput;
         const user: UserModel | null = await User.findOne({email} || {username: email});
-        if (!user) {
-            error(userErrors.USER_NOT_FOUND, 401);
-            return;
-        }
-        const isEqual: boolean = await bcrypt.compare(password, user.password);
-        if (!isEqual) {
-            error(userErrors.INCORRECT_PASSWORD, 401);
-            return;
-        }
-        const secretKey: string | undefined = process.env.JWT_SECRET;
-        const tokenExpiry: string | undefined = process.env.TOKEN_EXPIRY;
-
-        if (!secretKey) {
-            error(userErrors.SECRET_KEY_ERROR, 500);
-            return;
-        }
-        const token: string = jwt.sign(
-            {
-                userId: user._id.toString(),
-                email: user.email,
-            },
-            secretKey,
-            {expiresIn: tokenExpiry || '1d'},
-        );
-        return {token, userId: user._id.toString()};
-    } catch (e) {
-        error(e.message, e.code, e.data);
-    }
-};
-
-const postCampaign = async ({requestInput}: { requestInput: CampaignRequestModel }, req: Request) => {
-    try {
-        const {title, subTitle, entities} = requestInput;
-
-        const request = new CampaignRequest({title, subTitle, entities});
-        const createdRequest = await request.save();
-
-        const {createdAt, updatedAt, _id} = createdRequest;
-
-        return {
-            // @ts-ignore
-            ...createdRequest._doc,
-            createdAt: createdAt.toString(),
-            updatedAt: updatedAt.toString(),
-            _id: _id.toString(),
-        };
-    } catch (e) {
-        error(e.message, e.code, e.data);
-    }
-};
-const postCampaignEntity =
-    async ({entityInput, campaignRequestId}: { entityInput: IEntity[], campaignRequestId: string }, req: Request) => {
-        const campaign: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
-        if (!campaign) {
-            const {BAD_REQUEST, REQUEST_NOT_FOUND} = userErrors;
-            error(BAD_REQUEST + REQUEST_NOT_FOUND, 400, {message: 'wrong campaignRequestId'});
-            return;
-        }
-        if (isEntitiesValid(entityInput)) {
-            const {entities} = campaign;
-            let newEntities = [];
-            if (entities && entities.length > 0) {
-                newEntities = getEntities(entities, entityInput)
-            } else {
-                newEntities.push(...entityInput);
+        throwUserNotFoundError(user);
+        if (user) {
+            const isEqual: boolean = await bcrypt.compare(password, user.password);
+            if (!isEqual) {
+                error(userErrors.INCORRECT_PASSWORD, 401);
+                return;
             }
+            const secretKey: string | undefined = process.env.JWT_SECRET;
+            const tokenExpiry: string | undefined = process.env.TOKEN_EXPIRY;
 
-            campaign.entities = newEntities;
-            const updatedCampaign = await campaign.save();
-            const {createdAt, updatedAt, _id} = updatedCampaign;
+            if (!secretKey) {
+                error(userErrors.SECRET_KEY_ERROR, 500);
+                return;
+            }
+            const token: string = jwt.sign(
+                {
+                    userId: user._id.toString(),
+                    email: user.email,
+                },
+                secretKey,
+                {expiresIn: tokenExpiry || '1d'},
+            );
+            return {token, userId: user._id.toString()};
+        }
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+};
+
+const postCampaign = async ({requestInput}: { requestInput: CampaignRequestModel }, req: IRequest): Promise<CampaignRequestModel | undefined> => {
+    try {
+        const {isAuth} = req;
+        if (isAuth) {
+            const {title, subTitle, entities} = requestInput;
+
+            const request = new CampaignRequest({title, subTitle, entities});
+            const createdRequest = await request.save();
+
+            const {createdAt, updatedAt, _id} = createdRequest;
 
             return {
                 // @ts-ignore
-                ...updatedCampaign._doc,
+                ...createdRequest._doc,
                 createdAt: createdAt.toString(),
                 updatedAt: updatedAt.toString(),
                 _id: _id.toString(),
             };
         } else {
-            error(userErrors.BAD_REQUEST, 400, {message: 'Please add valid requestedAmount'});
+            error(userErrors.USR_NOT_AUTHORIZED, 401);
+        }
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+};
+const postCampaignEntity =
+    async ({entityInput, campaignRequestId}: { entityInput: IEntity[], campaignRequestId: string }, req: IRequest): Promise<CampaignRequestModel | undefined> => {
+        try {
+            const {isAuth} = req;
+            if (isAuth) {
+                const campaign: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+                if (!campaign) {
+                    const {BAD_REQUEST, REQUEST_NOT_FOUND} = userErrors;
+                    error(BAD_REQUEST + REQUEST_NOT_FOUND, 400, {message: 'wrong campaignRequestId'});
+                    return;
+                }
+                if (isEntitiesValid(entityInput)) {
+                    const {entities} = campaign;
+                    let newEntities = [];
+                    if (entities && entities.length > 0) {
+                        newEntities = getEntities(entities, entityInput)
+                    } else {
+                        newEntities.push(...entityInput);
+                    }
+
+                    campaign.entities = newEntities;
+                    const updatedCampaign = await campaign.save();
+                    const {createdAt, updatedAt, _id} = updatedCampaign;
+
+                    return {
+                        // @ts-ignore
+                        ...updatedCampaign._doc,
+                        createdAt: createdAt.toString(),
+                        updatedAt: updatedAt.toString(),
+                        _id: _id.toString(),
+                    };
+                } else {
+                    error(userErrors.BAD_REQUEST, 400, {message: 'Please add valid requestedAmount'});
+                }
+            } else {
+                error(userErrors.USR_NOT_AUTHORIZED, 401);
+            }
+        } catch (e) {
+            error(e.message, e.code, e.data);
         }
     };
 
+const postUserDonation = async ({campaignRequestId, amount}: { campaignRequestId: string, amount: number }, req: IRequest): Promise<UserModel | undefined> => {
+    try {
+        const {isAuth, userId} = req;
+        if (isAuth) {
+            const user: UserModel | null = await User.findOne({_id: userId});
+            throwUserNotFoundError(user);
+            if (user) {
+                if (user.donationHistory) {
+                    user.donationHistory.push({
+                        campaignRequestId: Types.ObjectId(campaignRequestId),
+                        donationAmount: amount,
+                    })
+                } else {
+                    user.donationHistory = [{
+                        campaignRequestId: Types.ObjectId(campaignRequestId),
+                        donationAmount: amount,
+                    }];
+                }
+                const updatedUser = await user.save();
+                const {createdAt, updatedAt, _id} = updatedUser;
+                return {
+                    // @ts-ignore
+                    ...updatedUser._doc,
+                    createdAt: createdAt.toString(),
+                    updatedAt: updatedAt.toString(),
+                    _id: _id.toString(),
+                }
+            }
+        } else {
+            error(userErrors.USR_NOT_AUTHORIZED, 401);
+        }
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+}
 
-const resolver = {singIn, login, postCampaign, postCampaignEntity};
+const postUserRewards = async ({points}: { points: number }, req: IRequest): Promise<UserModel | undefined> => {
+    const {isAuth, userId} = req;
+    if (isAuth) {
+        const user: UserModel | null = await User.findOne({_id: userId});
+        throwUserNotFoundError(user);
+        if (user) {
+            user.rewardPoints = points;
+            const updatedUser = await user.save();
+
+            const {createdAt, updatedAt, _id} = updatedUser;
+            return {
+                // @ts-ignore
+                ...updatedUser._doc,
+                createdAt: createdAt.toString(),
+                updatedAt: updatedAt.toString(),
+                _id: _id.toString(),
+            }
+        }
+    } else {
+        error(userErrors.USR_NOT_AUTHORIZED, 401);
+    }
+};
+
+
+const resolver = {singIn, login, postCampaign, postCampaignEntity, postUserDonation, postUserRewards};
 
 export default resolver;

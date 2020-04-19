@@ -1,5 +1,9 @@
+import User, {UserModel} from "@Models/User";
+import {Types} from "mongoose";
+
 export const userErrors = {
     USER_NOT_FOUND: 'User not found.',
+    USR_NOT_AUTHORIZED: 'User is not authorized',
     INCORRECT_PASSWORD: 'Password is incorrect.',
     SECRET_KEY_ERROR: 'Secret key not found.',
     BAD_REQUEST: 'Bad request.',
@@ -25,3 +29,11 @@ export const error = (message: string, code = 500, data?: IMessage[] | IMessage)
     }
     throw err;
 };
+
+export const throwUserNotFoundError = (user: UserModel | null) => {
+    if (!user) {
+        const {USER_NOT_FOUND} = userErrors;
+        error(USER_NOT_FOUND, 401);
+        return;
+    }
+}
