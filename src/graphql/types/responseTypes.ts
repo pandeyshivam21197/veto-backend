@@ -26,9 +26,9 @@ name: String!
     idProofImageUrl: String!
     DOB: String!
     contactNumber: String!
-    rewardPoints: Int
+    rewardPoints: Int!
     campaignRequestIds: [CampaignRequest]!
-    maxDistance: Int
+    maxDistance: Int!
     ${timeStamp}
 }
 `;

@@ -13,6 +13,8 @@ export type UserModel = Document & {
     rewardPoints?: number;
     campaignRequestIds?: [Schema.Types.ObjectId];
     maxDistance?: number;
+    createdAt: string;
+    updatedAt: string;
 };
 
 const userSchema: Schema = new Schema({

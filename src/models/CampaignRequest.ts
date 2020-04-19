@@ -11,6 +11,8 @@ export type CampaignRequestModel = Document & {
     subTitle?: string;
     entities?: [IEntity];
     status?: string,
+    createdAt: string;
+    updatedAt: string;
 };
 
 const entity = {

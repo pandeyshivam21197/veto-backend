@@ -1,16 +1,18 @@
 import express, {Request, Response, NextFunction, ErrorRequestHandler} from 'express';
 import {config} from 'dotenv';
-// @ts-ignore
-import graphqlHTTP from 'express-graphql';
+import GraphHTTP from 'express-graphql';
 
-import getSchema from '@Graphql/schemas/getSchema';
-import postSchema from '@Graphql/schemas/postSchema';
+import mongoose from 'mongoose';
 
-import getResolver from '@Graphql/resolvers/getResolver'
-import postResolver from '@Graphql/resolvers/postResolver'
+import schema from '@Graphql/Schema';
+
+import resolver from '@Graphql/Resolver'
 
 import bodyParser from 'body-parser';
-import Auth from './middlewares/Auth';
+import Auth from '@Middleware/Auth';
+
+const MONGODB_URI =
+    'mongodb+srv://shivam2:atria21197@cluster0-0drmr.mongodb.net/food?retryWrites=true&w=majority';
 
 interface IMessage {
     message: string;
@@ -26,24 +28,27 @@ const app = express();
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}));
 
+app.use((req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader(
+        'Access-Control-Allow-Methods',
+        'OPTIONS, GET, POST, PUT, PATCH, DELETE',
+    );
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
 // check for authentication and set isAuth and userId(object id)
 app.use(Auth);
 
-app.post(
+app.use(
     '/graphql',
-    graphqlHTTP({
-        schema: postSchema,
-        rootValue: getResolver,
-        graphiql: false,
-    }),
-);
-
-
-app.get(
-    '/graphql',
-    graphqlHTTP({
-        schema: getSchema,
-        rootValue: getResolver,
+    GraphHTTP({
+        schema,
+        rootValue: resolver,
         graphiql: true,
     }),
 );
@@ -59,11 +64,12 @@ config();
 const port: number = Number(process.env.PORT) || 3000;
 const hostname: string = process.env.HOST || 'localhost';
 
-app.listen(port, hostname, (error: string) => {
-    if (error) {
+mongoose
+    .connect(MONGODB_URI)
+    .then(result => {
+        app.listen(port, hostname);
+    })
+    .catch(err => {
         // tslint:disable-next-line:no-console
-        return console.log(error)
-    }
-    // tslint:disable-next-line:no-console
-    return console.log(`server is listening on ${port}`)
-});
+        console.log(err);
+    });
