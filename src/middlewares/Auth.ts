@@ -1,7 +1,7 @@
+import {error, userErrors} from '@Utils/errorUtil';
+import {NextFunction, Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
 import {Types} from 'mongoose';
-import {NextFunction, Request, Response} from 'express';
-import {error, userErrors} from '@Utils/errorUtil';
 
 interface IRequest extends Request {
     isAuth?: boolean;

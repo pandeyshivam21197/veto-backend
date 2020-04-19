@@ -1,5 +1,5 @@
-import express, {ErrorRequestHandler, NextFunction, Request, Response} from 'express';
 import {config} from 'dotenv';
+import express, {ErrorRequestHandler, NextFunction, Request, Response} from 'express';
 // @ts-ignore
 import GraphHTTP from 'express-graphql';
 
@@ -9,8 +9,8 @@ import schema from '@Graphql/Schema';
 
 import resolver from '@Graphql/Resolver'
 
-import bodyParser from 'body-parser';
 import Auth from '@Middleware/Auth';
+import bodyParser from 'body-parser';
 
 const MONGODB_URI =
     'mongodb+srv://shivam2:atria21197@cluster0-0drmr.mongodb.net/food?retryWrites=true&w=majority';

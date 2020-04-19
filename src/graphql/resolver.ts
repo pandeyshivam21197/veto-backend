@@ -1,12 +1,12 @@
-import {Request} from 'express';
-import bcrypt from 'bcryptjs';
-import User, {UserModel} from '@Models/User';
 import CampaignRequest from '@Models/CampaignRequest';
 import {CampaignRequestModel, IEntity} from '@Models/CampaignRequest';
+import User, {UserModel} from '@Models/User';
 import {error, IMessage, userErrors} from '@Utils/errorUtil';
+import {getEntities, isEntitiesValid} from '@Utils/resolverUtil';
+import bcrypt from 'bcryptjs';
+import {Request} from 'express';
 import jwt from 'jsonwebtoken';
 import {Types} from 'mongoose';
-import {getEntities, isEntitiesValid} from '@Utils/resolverUtil';
 import validator from 'validator';
 
 interface ILoginResponse {

@@ -1,7 +1,7 @@
-import {buildSchema, GraphQLSchema} from 'graphql';
+import {entity} from '@Graphql/types/commonTypes';
 import inputTypes from '@Graphql/types/inputTypes';
 import responseTypes from '@Graphql/types/responseTypes';
-import {entity} from '@Graphql/types/commonTypes';
+import {buildSchema, GraphQLSchema} from 'graphql';
 
 
 const {userInput, requestInput, entityInput} = inputTypes;
