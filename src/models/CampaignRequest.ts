@@ -14,6 +14,7 @@ export type CampaignRequestModel = Document & {
     status?: string,
     createdAt: string;
     updatedAt: string;
+    donerIds?: [Schema.Types.ObjectId];
 };
 
 const entity = {
@@ -51,6 +52,11 @@ const campaignRequestSchema: Schema = new Schema({
     status: {
         type: String,
         default: '',
+    },
+    donerIds: {
+        type: [Schema.Types.ObjectId],
+        ref: 'User',
+        default: [],
     },
 }, {timestamps: true});
 

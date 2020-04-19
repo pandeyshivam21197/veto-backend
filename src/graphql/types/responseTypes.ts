@@ -3,6 +3,7 @@ const timeStamp: string = `
     updatedAt: String!
 `;
 
+// require CampaignRequest type
 const DonationHistory: string = `
 type DonationHistory {
     campaignRequestIds: CampaignRequest!
@@ -10,7 +11,7 @@ type DonationHistory {
 }
 `;
 
-// Requires entity Type
+// Requires entity Type and User Type
 const CampaignRequest: string = `
 type CampaignRequest {
      _id: ID!
@@ -18,6 +19,7 @@ type CampaignRequest {
     subTitle: String
     entities: [entity]
     status: String
+    donerIds: [User]!
     ${timeStamp}
     }
 `;

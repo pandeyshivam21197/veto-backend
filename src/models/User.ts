@@ -4,6 +4,7 @@ interface IDonationHistory {
     requestId: Schema.Types.ObjectId;
     donationAmount: string;
 }
+
 export type UserModel = Document & {
     name: string;
     username: string;
@@ -23,9 +24,14 @@ export type UserModel = Document & {
 };
 
 const donationHistory = {
-    campaignRequestId: Schema.Types.ObjectId,
-    ref: 'CampaignRequest',
-    donationAmount: String,
+    campaignRequestId: {
+        type: Schema.Types.ObjectId,
+        ref: 'CampaignRequest',
+    },
+    donationAmount: {
+        type: String,
+        required: true,
+    },
 };
 
 const userSchema: Schema = new Schema({
