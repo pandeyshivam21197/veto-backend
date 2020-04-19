@@ -19,12 +19,12 @@ input entityInput {
     }
 `;
 
-// require entity
+// require entity Input
 const requestInput: string = `
 input requestInput {
     title: String!
     subTitle: String
-    entities: [entity]
+    entities: [entityInput]
 }
 `;
 

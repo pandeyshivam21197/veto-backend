@@ -8,13 +8,13 @@ const {userInput, requestInput, entityInput} = inputTypes;
 const {CampaignRequest, User} = responseTypes;
 
 // post Schema - create the data and post to data base (POST, PUT , DELETE, PATCH)
-const schema: GraphQLSchema = buildSchema(`
+const source = `
 ${entity}
 ${userInput}
-${User}
-${requestInput}
 ${CampaignRequest}
+${User}
 ${entityInput}
+${requestInput}
 
 type AuthResponse {
 token: String!
@@ -30,12 +30,18 @@ password: String!
     singIn(userInput: userInput!): User!
     login(loginInput: loginInput!): AuthResponse!
     postCampaign(requestInput: requestInput!): CampaignRequest!
-    postCampaignEntity(entityInput: [entityInput]!): CampaignRequest!
+    postCampaignEntity(campaignRequestId: String!, entityInput: [entityInput]!): CampaignRequest!
+    }
+
+    type RootQuery {
+    hello: String!
     }
 
 schema {
+        query: RootQuery
         mutation: RootMutation
     }
-`);
+`;
+const schema: GraphQLSchema = buildSchema(source);
 
 export default schema;

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {Types} from 'mongoose';
-import {Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import {error, userErrors} from '@Utils/errorUtil';
 
 interface IRequest extends Request {

@@ -3,9 +3,10 @@ const timeStamp: string = `
     updatedAt: String!
 `;
 
-// Requires entity
+// Requires entity Type
 const CampaignRequest: string = `
 type CampaignRequest {
+     _id: ID!
     title: String!
     subTitle: String
     entities: [entity]
@@ -14,10 +15,11 @@ type CampaignRequest {
     }
 `;
 
-// Requires CampaignRequest
+// Requires CampaignRequest Type
 const User: string = `
 type User {
-name: String!
+    _id: ID!
+    name: String!
     username: String!
     email: String!
     password: String!

@@ -1,0 +1,140 @@
+import {Request} from 'express';
+import bcrypt from 'bcryptjs';
+import User, {UserModel} from '@Models/User';
+import CampaignRequest from '@Models/CampaignRequest';
+import {CampaignRequestModel, IEntity} from '@Models/CampaignRequest';
+import {error, userErrors} from '@Utils/errorUtil';
+import jwt from 'jsonwebtoken';
+import {Types} from 'mongoose';
+import {isEntitiesValid} from '@Utils/resolverUtil';
+
+interface ILoginResponse {
+    token: string;
+    userId: string;
+}
+
+interface LoginInput {
+    email: string;
+    password: string;
+}
+
+const singIn = async ({userInput}: { userInput: UserModel }, req: Request) => {
+    try {
+        const {username, name, password, email, location, idProofImageUrl, idProofType, DOB, contactNumber} = userInput;
+        const encodedPassword = await bcrypt.hash(password, 12);
+
+        const user = new User(
+            {
+                username,
+                name,
+                password: encodedPassword,
+                email,
+                location,
+                idProofImageUrl,
+                idProofType,
+                DOB,
+                contactNumber,
+            },
+        );
+        const createdUser: UserModel = await user.save();
+        const {createdAt, updatedAt, _id} = createdUser;
+
+        return {
+            ...createdUser._doc,
+            createdAt: createdAt.toString,
+            updatedAt: updatedAt.toString(),
+            _id: _id.toString(),
+        }
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+};
+
+const login = async ({loginInput}: { loginInput: LoginInput }): Promise<ILoginResponse | void> => {
+    try {
+        const {email, password} = loginInput;
+        const user: UserModel | null = await User.findOne({email} || {username: email});
+        if (!user) {
+            error(userErrors.USER_NOT_FOUND, 401);
+            return;
+        }
+        const isEqual: boolean = await bcrypt.compare(password, user.password);
+        if (!isEqual) {
+            error(userErrors.INCORRECT_PASSWORD, 401);
+            return;
+        }
+        const secretKey: string | undefined = process.env.JWT_SECRET;
+        const tokenExpiry: string | undefined = process.env.TOKEN_EXPIRY;
+
+        if (!secretKey) {
+            error(userErrors.SECRET_KEY_ERROR, 500);
+            return;
+        }
+        const token: string = jwt.sign(
+            {
+                userId: user._id.toString(),
+                email: user.email,
+            },
+            secretKey,
+            {expiresIn: tokenExpiry || '1d'},
+        );
+        return {token, userId: user._id.toString()};
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+};
+
+const postCampaign = async ({requestInput}: { requestInput: CampaignRequestModel }, req: Request) => {
+    try {
+        const {title, subTitle, entities} = requestInput;
+        const data: [any] = [title];
+        if (subTitle) {
+            data.push(subTitle);
+        }
+        if (entities) {
+            data.push(entities)
+        }
+
+        const request = new CampaignRequest({...data});
+        const createdRequest = await request.save();
+
+        const {createdAt, updatedAt, _id} = createdRequest;
+
+        return {
+            ...createdRequest._doc,
+            createdAt: createdAt.toString(),
+            updatedAt: updatedAt.toString(),
+            _id: _id.toString(),
+        };
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+};
+const postCampaignEntity =
+    async ({entityInput, campaignRequestId}: { entityInput: [IEntity], campaignRequestId: string }, req: Request) => {
+        const campaign: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+        if (!campaign) {
+            const {BAD_REQUEST, REQUEST_NOT_FOUND} = userErrors;
+            error(BAD_REQUEST + REQUEST_NOT_FOUND, 400, {message: 'wrong campaignRequestId'});
+            return;
+        }
+        if(isEntitiesValid(entityInput)) {
+            campaign.entities = {...campaign.entities, ...entityInput};
+            const updatedCampaign = await campaign.save();
+            const {createdAt, updatedAt, _id} = updatedCampaign;
+
+            return {
+                ...updatedCampaign._doc,
+                createdAt: createdAt.toString(),
+                updatedAt: updatedAt.toString(),
+                _id: _id.toString(),
+            };
+        } else {
+            error(userErrors.BAD_REQUEST, 400, {message: 'Please add valid requestedAmount'});
+        }
+    };
+
+
+const resolver = {singIn, login, postCampaign, postCampaignEntity};
+
+export default resolver;

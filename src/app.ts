@@ -1,5 +1,6 @@
-import express, {Request, Response, NextFunction, ErrorRequestHandler} from 'express';
+import express, {ErrorRequestHandler, NextFunction, Request, Response} from 'express';
 import {config} from 'dotenv';
+// @ts-ignore
 import GraphHTTP from 'express-graphql';
 
 import mongoose from 'mongoose';
@@ -27,6 +28,8 @@ const app = express();
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json()); // application/json
+
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -50,6 +53,15 @@ app.use(
         schema,
         rootValue: resolver,
         graphiql: true,
+        formatError(err: Error) {
+            if (!err.originalError) {
+                return err;
+            }
+            const data = err.originalError.data;
+            const message = err.message || 'An error occurred.';
+            const code = err.originalError.code || 500;
+            return { message, status: code, data };
+        },
     }),
 );
 
@@ -65,9 +77,12 @@ const port: number = Number(process.env.PORT) || 3000;
 const hostname: string = process.env.HOST || 'localhost';
 
 mongoose
-    .connect(MONGODB_URI)
+    .connect(MONGODB_URI, {useNewUrlParser: true, useUnifiedTopology: true})
     .then(result => {
-        app.listen(port, hostname);
+        app.listen(port, hostname, () => {
+            // tslint:disable-next-line:no-console
+            console.log('connected on ' + port);
+        });
     })
     .catch(err => {
         // tslint:disable-next-line:no-console
