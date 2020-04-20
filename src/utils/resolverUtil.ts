@@ -6,7 +6,9 @@ import {
     IEntity,
 } from '@Models/CampaignRequest';
 import {imageTypes, IThumbnail, thumbnailType} from '@Models/Feed';
-import {campaignRequestError, error} from '@Utils/errorUtil';
+import User, {UserModel} from '@Models/User';
+import {campaignRequestError, error, throwUserNotFoundError} from '@Utils/errorUtil';
+import {Types} from 'mongoose';
 
 export const isEntitiesValid = (entities: IEntity[]): boolean => {
     let isValid: boolean = true;
@@ -19,7 +21,7 @@ export const isEntitiesValid = (entities: IEntity[]): boolean => {
     return isValid;
 };
 
-export const getEntities = (oldEntities: IEntity[], newEntities: IEntity[]): IEntity[] => {
+export const getUpdatedEntities = (oldEntities: IEntity[], newEntities: IEntity[]): IEntity[] => {
     oldEntities.forEach((entity: IEntity, index: number) => {
         const foundIndex = newEntities.findIndex((newEntity: IEntity) => newEntity.title.toLowerCase() === entity.title.toLowerCase());
         if (index >= 0) {
@@ -68,3 +70,50 @@ export const getCampaignStatus = (CampaignRequest: CampaignRequestModel): string
 
     return isAllEntitiesAvailed ? campaignRequestStatus.COMPLETED : status;
 }
+
+export const updateUserProperty = async (property = {}, userId: Types.ObjectId | undefined) => {
+    let user: UserModel | null = await User.findOne({_id: userId});
+    throwUserNotFoundError(user);
+    // @ts-ignore
+    user = {...user, ...property};
+    if (user) {
+        const updatedUser = await user.save();
+
+        const {createdAt, updatedAt, _id} = updatedUser;
+
+        return {
+            // @ts-ignore
+            ...updatedUser._doc,
+            createdAt: createdAt.toString(),
+            updatedAt: updatedAt.toString(),
+            _id: _id.toString(),
+        }
+    }
+
+}
+
+export const getUpdatedCampaignResponse = async (campaignRequest: CampaignRequestModel) => {
+    const updatedCampaign = await campaignRequest.save();
+    const {createdAt, updatedAt, _id} = updatedCampaign;
+
+    return {
+        // @ts-ignore
+        ...updatedCampaign._doc,
+        createdAt: createdAt.toString(),
+        updatedAt: updatedAt.toString(),
+        _id: _id.toString(),
+    };
+};
+
+export const getUpdatedUserResponse = async (user: UserModel) => {
+    const updatedUser = await user.save();
+    const {createdAt, updatedAt, _id} = updatedUser;
+
+    return {
+        // @ts-ignore
+        ...updatedUser._doc,
+        createdAt: createdAt.toString(),
+        updatedAt: updatedAt.toString(),
+        _id: _id.toString(),
+    };
+};

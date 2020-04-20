@@ -13,10 +13,11 @@ import {
 } from '@Utils/errorUtil';
 import {
     getCampaignStatus,
-    getEntities,
+    getUpdatedCampaignResponse,
+    getUpdatedUserResponse,
     isEntitiesValid,
     setThumbnailsType,
-    updateEntityAmount,
+    updateEntityAmount, updateUserProperty,
 } from '@Utils/resolverUtil';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -99,16 +100,7 @@ const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
                 contactNumber,
             },
         );
-        const createdUser: UserModel = await user.save();
-        const {createdAt, updatedAt, _id} = createdUser;
-
-        return {
-            // @ts-ignore
-            ...createdUser._doc,
-            createdAt: createdAt.toString,
-            updatedAt: updatedAt.toString(),
-            _id: _id.toString(),
-        }
+        return await getUpdatedUserResponse(user);
     } catch (e) {
         error(e.message, e.code, e.data);
     }
@@ -161,20 +153,9 @@ const postCampaign = async ({requestInput}: IPostCampaign, req: IRequest): Promi
         const user: UserModel | null = await User.findOne({_id: userId});
         throwUserNotFoundError(user);
         if (user) {
-            if (user.campaignRequestIds) {
-                user.campaignRequestIds.push(_id);
-            } else {
-                user.campaignRequestIds = [_id];
-            }
+            user.campaignRequestIds.push(_id);
+            return await getUpdatedUserResponse(user);
         }
-
-        return {
-            // @ts-ignore
-            ...createdRequest._doc,
-            createdAt: createdAt.toString(),
-            updatedAt: updatedAt.toString(),
-            _id: _id.toString(),
-        };
     } catch (e) {
         error(e.message, e.code, e.data);
     }
@@ -190,22 +171,13 @@ const postCampaignEntity =
                     const {entities} = campaignRequest;
                     let newEntities = [];
                     if (entities && entities.length > 0) {
-                        newEntities = getEntities(entities, entityInput)
+                        newEntities = getUpdatedEntities(entities, entityInput)
                     } else {
                         newEntities.push(...entityInput);
                     }
 
                     campaignRequest.entities = newEntities;
-                    const updatedCampaign = await campaignRequest.save();
-                    const {createdAt, updatedAt, _id} = updatedCampaign;
-
-                    return {
-                        // @ts-ignore
-                        ...updatedCampaign._doc,
-                        createdAt: createdAt.toString(),
-                        updatedAt: updatedAt.toString(),
-                        _id: _id.toString(),
-                    };
+                    return await getUpdatedCampaignResponse(campaignRequest);
                 }
             } else {
                 error(userErrors.BAD_REQUEST, 400, {message: 'Please add valid requestedAmount'});
@@ -238,6 +210,7 @@ const postCampaignDonation =
                 }
                 user.rewardPoints = user.rewardPoints + 1;
                 await user.save();
+
                 const campaignRequest: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
                 throwCampaignNotFoundError(campaignRequest);
                 if (campaignRequest) {
@@ -251,16 +224,7 @@ const postCampaignDonation =
                     // Sets campaign status if done
                     campaignRequest.status = getCampaignStatus(campaignRequest);
 
-                    await campaignRequest.save();
-
-                    const {createdAt, updatedAt, _id} = campaignRequest;
-                    return {
-                        // @ts-ignore
-                        ...campaignRequest._doc,
-                        createdAt: createdAt.toString(),
-                        updatedAt: updatedAt.toString(),
-                        _id: _id.toString(),
-                    }
+                    return await getUpdatedCampaignResponse(campaignRequest);
                 }
             }
         } catch (e) {
@@ -272,21 +236,7 @@ const postUserRewards = async ({points}: IPostUserRewards, req: IRequest): Promi
     const {userId} = req;
     try {
         throwUserNotAuthorized(req);
-        const user: UserModel | null = await User.findOne({_id: userId});
-        throwUserNotFoundError(user);
-        if (user) {
-            user.rewardPoints = points;
-            const updatedUser = await user.save();
-
-            const {createdAt, updatedAt, _id} = updatedUser;
-            return {
-                // @ts-ignore
-                ...updatedUser._doc,
-                createdAt: createdAt.toString(),
-                updatedAt: updatedAt.toString(),
-                _id: _id.toString(),
-            }
-        }
+        return await updateUserProperty({rewardPoints: points}, userId);
     } catch (e) {
         error(e.message, e.code, e.data);
     }
@@ -299,12 +249,23 @@ const postCampaignThumbnails = async ({campaignRequestId, thumbnails}: IPostCamp
         throwCampaignNotFoundError(campaignRequest);
         if (campaignRequest) {
             campaignRequest.thumbnails = setThumbnailsType(campaignRequest.thumbnails, thumbnails);
-            await campaignRequest.save();
+
+            return await getUpdatedCampaignResponse(campaignRequest);
         }
     } catch (e) {
         error(e.message, e.code, e.data);
     }
 };
+
+const postUserMaxDistance = async ({distance}: { distance: number }, req: IRequest): Promise<UserModel | undefined> => {
+    try {
+        const {userId} = req;
+        throwUserNotAuthorized(req);
+        return await updateUserProperty({maxDistance: distance}, userId);
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+}
 
 
 const resolver = {
@@ -315,6 +276,7 @@ const resolver = {
     postCampaignDonation,
     postUserRewards,
     postCampaignThumbnails,
+    postUserMaxDistance,
 };
 
 export default resolver;

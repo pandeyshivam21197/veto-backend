@@ -33,8 +33,9 @@ password: String!
     postCampaign(requestInput: requestInput!): CampaignRequest!
     postCampaignEntity(campaignRequestId: String!, entityInput: [entityInput]!): CampaignRequest!
     postCampaignDonation(campaignRequestId: String!, entity: DonationEntityInput!): CampaignRequest!
-    postUserRewards(points: Int!): User!
     postCampaignThumbnails(campaignRequestId: String!, thumbnails: Thumbnails): CampaignRequest!
+    postUserRewards(points: Int!): User!
+    postUserMaxDistance(distance: Int!): User!
     }
 
     type RootQuery {
