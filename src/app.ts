@@ -1,7 +1,7 @@
 import {config} from 'dotenv';
 import express, {ErrorRequestHandler, NextFunction, Request, Response} from 'express';
 // @ts-ignore
-import GraphHTTP from 'express-graphql';
+import GraphHTTP, {GraphQLError} from 'express-graphql';
 
 import mongoose from 'mongoose';
 
@@ -53,14 +53,14 @@ app.use(
         schema,
         rootValue: resolver,
         graphiql: true,
-        formatError(err: Error) {
+        formatError: (err: GraphQLError) => {
             if (!err.originalError) {
                 return err;
             }
             const data = err.originalError.data;
             const message = err.message || 'An error occurred.';
             const code = err.originalError.code || 500;
-            return { message, status: code, data };
+            return {message, status: code, data};
         },
     }),
 );
