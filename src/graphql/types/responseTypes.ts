@@ -39,6 +39,7 @@ type CampaignRequest {
     donerIds: [User]!
     groupMemberIds: [User]!
     thumbnails: [Thumbnails]!
+    description: String!
     ${timeStamp}
     }
 `;

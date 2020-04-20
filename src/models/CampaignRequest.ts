@@ -1,4 +1,3 @@
-import {IThumbnail, thumbnail} from '@Models/Feed';
 import {Document, model, Schema, Types} from 'mongoose';
 
 export interface IEntity {
@@ -12,6 +11,11 @@ export interface IEntity {
 export interface IDonationEntity {
     title: string;
     amount: number;
+}
+
+export interface IThumbnail {
+    url: string;
+    type: string;
 }
 
 export type CampaignRequestModel = Document & {
@@ -30,8 +34,27 @@ export const entityStatus = {
     AVAILED: 'Availed',
 };
 
+export const thumbnailType = {
+    IMAGE: 'Image',
+    VIDEO: 'Video',
+}
+
 export const campaignRequestStatus = {
     COMPLETED: 'Completed',
+    AVAILED: 'Availed',
+};
+
+export const imageTypes = ['jpeg', 'jpg', 'png', 'gif', 'tiff'];
+
+export const thumbnail = {
+    url: {
+        type: String,
+        required: true,
+    },
+    type: {
+        type: String,
+        default: '',
+    },
 };
 
 const entity = {
@@ -87,6 +110,10 @@ const campaignRequestSchema: Schema = new Schema({
     thumbnails: {
         type: [thumbnail],
         default: [],
+    },
+    description: {
+        type: String!,
+        default: '',
     },
 }, {timestamps: true});
 

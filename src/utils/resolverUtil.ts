@@ -4,8 +4,10 @@ import {
     entityStatus,
     IDonationEntity,
     IEntity,
+    imageTypes,
+    IThumbnail,
+    thumbnailType,
 } from '@Models/CampaignRequest';
-import {imageTypes, IThumbnail, thumbnailType} from '@Models/Feed';
 import User, {UserModel} from '@Models/User';
 import {campaignRequestError, error, throwUserNotFoundError} from '@Utils/errorUtil';
 import {Types} from 'mongoose';
@@ -68,7 +70,7 @@ export const getCampaignStatus = (CampaignRequest: CampaignRequestModel): string
     const {entities, status} = CampaignRequest;
     const isAllEntitiesAvailed: boolean = entities.every((entity: IEntity) => entity.status === entityStatus.AVAILED);
 
-    return isAllEntitiesAvailed ? campaignRequestStatus.COMPLETED : status;
+    return isAllEntitiesAvailed ? campaignRequestStatus.AVAILED : status;
 }
 
 export const updateUserProperty = async (property = {}, userId: Types.ObjectId | undefined) => {

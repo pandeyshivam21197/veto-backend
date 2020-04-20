@@ -1,8 +1,6 @@
 import {IRequest} from '@Middleware/Auth';
 import CampaignRequest, {IDonationEntity} from '@Models/CampaignRequest';
-import {CampaignRequestModel, campaignRequestStatus, IEntity} from '@Models/CampaignRequest';
-import {IThumbnail} from '@Models/Feed';
-import Feed from '@Models/Feed';
+import {CampaignRequestModel, campaignRequestStatus, IEntity, IThumbnail} from '@Models/CampaignRequest';
 import User, {UserModel} from '@Models/User';
 import {
     error,
@@ -224,10 +222,6 @@ const postCampaignDonation =
                     campaignRequest.donerIds = [...donerIds, donerId];
                     // Sets campaign status if done
                     campaignRequest.status = getCampaignStatus(campaignRequest);
-
-                    if (campaignRequest.status === campaignRequestStatus.COMPLETED) {
-                        const feed = new Feed({})
-                    }
 
                     return await getUpdatedCampaignResponse(campaignRequest);
                 }
