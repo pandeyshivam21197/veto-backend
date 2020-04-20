@@ -138,29 +138,33 @@ const login = async ({loginInput}: ILogin): Promise<ILoginResponse | void> => {
     }
 };
 
-const postCampaign = async ({requestInput}: IPostCampaign, req: IRequest): Promise<CampaignRequestModel | undefined> => {
-    try {
-        const {userId} = req;
-        throwUserNotAuthorized(req);
-        const {title, subTitle, entities} = requestInput;
+const postCampaign =
+    async ({requestInput}: IPostCampaign, req: IRequest): Promise<CampaignRequestModel | undefined> => {
+        try {
+            const {userId} = req;
+            throwUserNotAuthorized(req);
+            const {title, subTitle, entities} = requestInput;
 
-        const request = new CampaignRequest({title, subTitle, entities});
-        const createdRequest = await request.save();
+            const request = new CampaignRequest({title, subTitle, entities});
+            const createdRequest = await request.save();
 
-        const {createdAt, updatedAt, _id} = createdRequest;
+            const {createdAt, updatedAt, _id} = createdRequest;
 
-        const user: UserModel | null = await User.findOne({_id: userId});
-        throwUserNotFoundError(user);
-        if (user) {
-            user.campaignRequestIds.push(_id);
-            return await getUpdatedUserResponse(user);
+            const user: UserModel | null = await User.findOne({_id: userId});
+            throwUserNotFoundError(user);
+            if (user) {
+                user.campaignRequestIds.push(_id);
+                return await getUpdatedUserResponse(user);
+            }
+        } catch (e) {
+            error(e.message, e.code, e.data);
         }
-    } catch (e) {
-        error(e.message, e.code, e.data);
-    }
-};
+    };
 const postCampaignEntity =
-    async ({entityInput, campaignRequestId}: IPostCampaignEntity, req: IRequest): Promise<CampaignRequestModel | undefined> => {
+    async (
+        {entityInput, campaignRequestId}: IPostCampaignEntity,
+        req: IRequest,
+    ): Promise<CampaignRequestModel | undefined> => {
         try {
             throwUserNotAuthorized(req);
             const campaignRequest: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
@@ -187,7 +191,10 @@ const postCampaignEntity =
     };
 
 const postCampaignDonation =
-    async ({campaignRequestId, entity}: IPostCampaignDonation, req: IRequest): Promise<CampaignRequestModel | undefined> => {
+    async (
+        {campaignRequestId, entity}: IPostCampaignDonation,
+        req: IRequest,
+    ): Promise<CampaignRequestModel | undefined> => {
         try {
             const {userId} = req;
             throwUserNotAuthorized(req);
@@ -210,7 +217,9 @@ const postCampaignDonation =
                 user.rewardPoints = user.rewardPoints + 1;
                 await user.save();
 
-                const campaignRequest: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+                const campaignRequest: CampaignRequestModel | null =
+                    await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+
                 throwCampaignNotFoundError(campaignRequest);
                 if (campaignRequest) {
                     const {donerIds, entities} = campaignRequest;
@@ -244,7 +253,9 @@ const postUserRewards = async ({points}: IPostUserRewards, req: IRequest): Promi
 const postCampaignThumbnails = async ({campaignRequestId, thumbnails}: IPostCampaignThumbnails, req: IRequest) => {
     try {
         throwUserNotAuthorized(req);
-        const campaignRequest: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+        const campaignRequest: CampaignRequestModel | null =
+            await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+
         throwCampaignNotFoundError(campaignRequest);
         if (campaignRequest) {
             campaignRequest.thumbnails = setThumbnailsType(campaignRequest.thumbnails, thumbnails);
@@ -270,7 +281,9 @@ const addOtherCampaignGroupMember = async ({campaignRequestId}: { campaignReques
     try {
         const {userId} = req;
         throwUserNotAuthorized(req);
-        const campaignRequest: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+        const campaignRequest: CampaignRequestModel | null =
+            await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+
         if (campaignRequest && userId) {
             campaignRequest.groupMemberIds.push(userId);
 

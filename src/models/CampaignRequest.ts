@@ -112,7 +112,7 @@ const campaignRequestSchema: Schema = new Schema({
         default: [],
     },
     description: {
-        type: String!,
+        type: String,
         default: '',
     },
 }, {timestamps: true});
