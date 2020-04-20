@@ -22,6 +22,7 @@ export type CampaignRequestModel = Document & {
     createdAt: string;
     updatedAt: string;
     donerIds: Types.ObjectId[];
+    groupMemberIds: Types.ObjectId[];
     thumbnails: IThumbnail[];
 };
 
@@ -74,6 +75,11 @@ const campaignRequestSchema: Schema = new Schema({
         default: '',
     },
     donerIds: {
+        type: [Schema.Types.ObjectId],
+        ref: 'User',
+        default: [],
+    },
+    groupMemberIds: {
         type: [Schema.Types.ObjectId],
         ref: 'User',
         default: [],

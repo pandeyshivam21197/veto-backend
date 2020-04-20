@@ -37,6 +37,7 @@ type CampaignRequest {
     entities: [entity]!
     status: String!
     donerIds: [User]!
+    groupMemberIds: [User]!
     thumbnails: [Thumbnails]!
     ${timeStamp}
     }
@@ -57,6 +58,7 @@ type User {
     contactNumber: String!
     rewardPoints: Int!
     campaignRequestIds: [CampaignRequest]!
+    otherCampaignRequestIds: [CampaignRequest]!
     donationHistory: [DonationHistory]!
     maxDistance: Int!
     ${timeStamp}

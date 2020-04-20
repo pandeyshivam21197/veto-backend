@@ -1,7 +1,8 @@
 import {IRequest} from '@Middleware/Auth';
-import {CampaignRequestModel, IEntity} from '@Models/CampaignRequest';
 import CampaignRequest, {IDonationEntity} from '@Models/CampaignRequest';
+import {CampaignRequestModel, campaignRequestStatus, IEntity} from '@Models/CampaignRequest';
 import {IThumbnail} from '@Models/Feed';
+import Feed from '@Models/Feed';
 import User, {UserModel} from '@Models/User';
 import {
     error,
@@ -13,7 +14,7 @@ import {
 } from '@Utils/errorUtil';
 import {
     getCampaignStatus,
-    getUpdatedCampaignResponse,
+    getUpdatedCampaignResponse, getUpdatedEntities,
     getUpdatedUserResponse,
     isEntitiesValid,
     setThumbnailsType,
@@ -224,6 +225,10 @@ const postCampaignDonation =
                     // Sets campaign status if done
                     campaignRequest.status = getCampaignStatus(campaignRequest);
 
+                    if (campaignRequest.status === campaignRequestStatus.COMPLETED) {
+                        const feed = new Feed({})
+                    }
+
                     return await getUpdatedCampaignResponse(campaignRequest);
                 }
             }
@@ -267,6 +272,26 @@ const postUserMaxDistance = async ({distance}: { distance: number }, req: IReque
     }
 }
 
+const addOtherCampaignGroupMember = async ({campaignRequestId}: { campaignRequestId: string }, req: IRequest) => {
+    try {
+        const {userId} = req;
+        throwUserNotAuthorized(req);
+        const campaignRequest: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+        if (campaignRequest && userId) {
+            campaignRequest.groupMemberIds.push(userId);
+
+            const user: UserModel | null = await User.findOne({_id: userId});
+            throwUserNotFoundError(user);
+            if (user) {
+                user.otherCampaignRequestIds.push(campaignRequest._id);
+                return await getUpdatedUserResponse(user);
+            }
+        }
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+}
+
 
 const resolver = {
     singIn,
@@ -277,6 +302,7 @@ const resolver = {
     postUserRewards,
     postCampaignThumbnails,
     postUserMaxDistance,
+    addOtherCampaignGroupMember,
 };
 
 export default resolver;
