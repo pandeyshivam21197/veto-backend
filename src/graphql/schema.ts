@@ -38,10 +38,13 @@ password: String!
     postCampaignCompletionDescription(campaignRequestId: String!, description: String!): CampaignRequest!
     postUserRewards(points: Int!): User!
     postUserMaxDistance(distance: Int!): User!
+
+    getRequestedCampaign(campaignRequestId: String!): CampaignRequest!
     }
 
     type RootQuery {
-    hello: String!
+    getCampaignRequests: [CampaignRequest]!
+    getUserData: User!
     }
 
 schema {

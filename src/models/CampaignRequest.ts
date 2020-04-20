@@ -42,8 +42,9 @@ export const thumbnailType = {
 }
 
 export const campaignRequestStatus = {
-    COMPLETED: 'Completed',
+    INITIATED: 'Initiated',
     AVAILED: 'Availed',
+    COMPLETED: 'Completed',
 };
 
 export const imageTypes = ['jpeg', 'jpg', 'png', 'gif', 'tiff'];
@@ -97,7 +98,7 @@ const campaignRequestSchema: Schema = new Schema({
     },
     status: {
         type: String,
-        default: '',
+        default: campaignRequestStatus.INITIATED,
     },
     creatorId: {
         type: Schema.Types.ObjectId,

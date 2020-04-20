@@ -1,4 +1,4 @@
-import {
+import CampaignRequest, {
     CampaignRequestModel,
     campaignRequestStatus,
     entityStatus,
@@ -123,4 +123,14 @@ export const getUpdatedUserResponse = async (user: UserModel) => {
         updatedAt: updatedAt.toString(),
         _id: _id.toString(),
     };
+};
+
+// TODO: add lookup similar to populate
+export const getStatusSortedCampaigns = () => {
+    const {COMPLETED, INITIATED, AVAILED} = campaignRequestStatus;
+    return CampaignRequest.aggregate([
+        {$group: {$match: {status: COMPLETED}, $sort: {createdAt: -1}}},
+        {$group: {$match: {status: AVAILED}, $sort: {createdAt: -1}}},
+        {$group: {$match: {status: INITIATED}, $sort: {createdAt: -1}}},
+    ])
 };

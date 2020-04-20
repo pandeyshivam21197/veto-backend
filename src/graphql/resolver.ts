@@ -10,7 +10,7 @@ import {
     userErrors,
 } from '@Utils/errorUtil';
 import {
-    getCampaignStatus,
+    getCampaignStatus, getStatusSortedCampaigns,
     getUpdatedCampaignResponse, getUpdatedEntities,
     getUpdatedUserResponse,
     isEntitiesValid,
@@ -333,6 +333,54 @@ const postCampaignCompletionDescription =
         }
     }
 
+const getCampaignRequests = (req: IRequest) => {
+    try {
+        throwUserNotAuthorized(req);
+        return getStatusSortedCampaigns();
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+}
+
+const getUserData = async (req: IRequest) => {
+    try {
+        const {userId} = req;
+        throwUserNotAuthorized(req);
+
+        const user: UserModel | null = await User.findOne({_id: userId});
+        throwUserNotFoundError(user);
+        if (user) {
+            const {createdAt, updatedAt, _id} = user;
+
+            return {
+                // @ts-ignore
+                ...user._doc,
+                createdAt: createdAt.toString(),
+                updatedAt: updatedAt.toString(),
+                _id: _id.toString(),
+            };
+        }
+    } catch (e) {
+        error(e.message, e.code, e.data);
+    }
+}
+
+const getRequestedCampaign = async ({campaignRequestId}: ICampaignRequestId, req: IRequest) => {
+    try {
+        throwUserNotAuthorized(req);
+        const campaignRequest: CampaignRequestModel | null =
+            await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+        throwCampaignNotFoundError(campaignRequest);
+
+        if (campaignRequest) {
+            return await getUpdatedCampaignResponse(campaignRequest);
+        }
+    } catch (e) {
+        error(e.message, e.code, e.data);
+
+    }
+}
+// TODO: add populate to all the resolver
 
 const resolver = {
     singIn,
@@ -345,6 +393,9 @@ const resolver = {
     postUserMaxDistance,
     addOtherCampaignGroupMember,
     postCampaignCompletionDescription,
+    getCampaignRequests,
+    getUserData,
+    getRequestedCampaign,
 };
 
 export default resolver;
