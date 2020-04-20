@@ -5,11 +5,17 @@ export interface IThumbnail {
     type: string;
 }
 
+interface ISupporters {
+    groupMemberIds: [Types.ObjectId];
+    donerIds: [Types.ObjectId];
+}
+
 export type FeedModel = Document & {
     title: string;
     description: string;
     creatorId: Types.ObjectId;
-    supporterIds: [Types.ObjectId];
+    campaignId: Types.ObjectId;
+    supporters: ISupporters;
     thumbnails: IThumbnail[];
 };
 
@@ -31,6 +37,19 @@ export const thumbnail = {
     },
 };
 
+const supporterIds = {
+    groupMemberIds: {
+        type: [Schema.Types.ObjectId],
+        ref: 'User',
+        default: [],
+    },
+    donerIds: {
+        type: [Schema.Types.ObjectId],
+        ref: 'User',
+        default: [],
+    },
+}
+
 const feedSchema = new Schema({
     title: {
         type: String,
@@ -44,9 +63,12 @@ const feedSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true,
     },
-    supporterIds: {
-        type: [Schema.Types.ObjectId],
-        default: [],
+    campaignId: {
+        type: Schema.Types.ObjectId,
+        default: '',
+    },
+    supporters: {
+        type: supporterIds,
     },
     thumbnails: {
         type: [thumbnail],
