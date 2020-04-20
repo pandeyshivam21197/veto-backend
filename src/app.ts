@@ -5,9 +5,9 @@ import GraphHTTP from 'express-graphql';
 
 import mongoose from 'mongoose';
 
-import schema from '@Graphql/Schema';
+import schema from '@Graphql/schema';
 
-import resolver from '@Graphql/Resolver'
+import resolver from '@Graphql/resolver'
 
 import Auth from '@Middleware/Auth';
 import bodyParser from 'body-parser';
