@@ -158,7 +158,10 @@ const postCampaign =
             throwUserNotFoundError(user);
             if (user) {
                 user.campaignRequestIds.push(_id);
-                return await getUpdatedUserResponse(user);
+                createdRequest.creatorId = user._id;
+                const updatedCampaign = await createdRequest.save();
+
+                return await getUpdatedCampaignResponse(updatedCampaign);
             }
         } catch (e) {
             error(e.message, e.code, e.data);
@@ -310,19 +313,21 @@ const postCampaignCompletionDescription =
         req: IRequest,
     ): Promise<CampaignRequestModel | undefined> => {
 
+        const {userId} = req;
         try {
             throwUserNotAuthorized(req);
 
             const campaignRequest: CampaignRequestModel | null =
                 await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
             throwCampaignNotFoundError(campaignRequest);
-
-            if (campaignRequest) {
+            // check is the campaign creator allowed
+            if (campaignRequest && campaignRequest.creatorId === userId) {
                 campaignRequest.status = campaignRequestStatus.COMPLETED;
                 campaignRequest.description = description;
                 return await getUpdatedCampaignResponse(campaignRequest);
+            } else {
+                error(userErrors.USR_NOT_AUTHORIZED, 403, {message: 'Only campaign creator allowed.'})
             }
-
         } catch (e) {
             error(e.message, e.code, e.data);
         }

@@ -30,6 +30,10 @@ addOtherCampaignGroupMember(campaignRequestId: String!): User!
 ```
     to allow other user to become part of others campaign
 ```
+postCampaignCompletionDescription(campaignRequestId: String!, description: String!): CampaignRequest!
+```
+    to allow other campaign creator to set the description and end the campaign.
+```
 postUserRewards(points: Int!): User!
 ```
     to post user rewards

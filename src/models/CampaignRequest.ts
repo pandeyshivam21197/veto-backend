@@ -25,6 +25,7 @@ export type CampaignRequestModel = Document & {
     status: string,
     createdAt: string;
     updatedAt: string;
+    creatorId: Types.ObjectId;
     donerIds: Types.ObjectId[];
     groupMemberIds: Types.ObjectId[];
     thumbnails: IThumbnail[];
@@ -96,6 +97,11 @@ const campaignRequestSchema: Schema = new Schema({
     },
     status: {
         type: String,
+        default: '',
+    },
+    creatorId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         default: '',
     },
     donerIds: {

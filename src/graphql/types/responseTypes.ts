@@ -36,6 +36,7 @@ type CampaignRequest {
     subTitle: String!
     entities: [entity]!
     status: String!
+    creatorId: User!
     donerIds: [User]!
     groupMemberIds: [User]!
     thumbnails: [Thumbnails]!
