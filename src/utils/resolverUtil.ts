@@ -71,8 +71,8 @@ export const setThumbnailsType = (oldThumbnails: IThumbnail[], newThumbnails: IT
     return [...oldThumbnails, ...newThumbnails];
 };
 
-export const getCampaignStatus = (CampaignRequest: CampaignRequestModel): string => {
-    const {entities, status} = CampaignRequest;
+export const getCampaignStatus = (campaignRequest: CampaignRequestModel): string => {
+    const {entities, status} = campaignRequest;
     const isAllEntitiesAvailed: boolean = entities.every((entity: IEntity) => entity.status === entityStatus.AVAILED);
 
     return isAllEntitiesAvailed ? campaignRequestStatus.AVAILED : status;
