@@ -25,7 +25,12 @@ export const isEntitiesValid = (entities: IEntity[]): boolean => {
 
 export const getUpdatedEntities = (oldEntities: IEntity[], newEntities: IEntity[]): IEntity[] => {
     oldEntities.forEach((entity: IEntity, index: number) => {
-        const foundIndex = newEntities.findIndex((newEntity: IEntity) => newEntity.title.toLowerCase() === entity.title.toLowerCase());
+        const foundIndex: number =
+            newEntities
+                .findIndex(
+                    (newEntity: IEntity) => newEntity.title.toLowerCase() === entity.title.toLowerCase(),
+                );
+
         if (index >= 0) {
             const oldAmount = oldEntities[index].requestedAmount;
             const additionAmount = newEntities[foundIndex].requestedAmount;
