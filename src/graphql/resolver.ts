@@ -1,10 +1,9 @@
-import {IRequest} from '@Middleware/Auth';
 import CampaignRequest, {IDonationEntity} from '@Models/CampaignRequest';
 import {CampaignRequestModel, campaignRequestStatus, IEntity, IThumbnail} from '@Models/CampaignRequest';
 import User, {UserModel} from '@Models/User';
 import {
     error,
-    IMessage,
+    IMessage, IRequest,
     throwCampaignNotFoundError,
     throwUserNotAuthorized,
     throwUserNotFoundError,
@@ -45,13 +44,11 @@ interface IPostCampaign {
     requestInput: CampaignRequestModel;
 }
 
-interface IPostCampaignEntity {
+interface IPostCampaignEntity extends ICampaignRequestId {
     entityInput: IEntity[];
-    campaignRequestId: string;
 }
 
-interface IPostCampaignDonation {
-    campaignRequestId: string;
+interface IPostCampaignDonation extends ICampaignRequestId {
     entity: IDonationEntity;
 }
 
@@ -63,8 +60,15 @@ interface IThumbnails {
     thumbnails: IThumbnail[];
 }
 
-interface IPostCampaignThumbnails extends IThumbnails {
+interface ICampaignRequestId {
     campaignRequestId: string;
+}
+
+interface IPostCampaignDescription extends ICampaignRequestId {
+    description: string;
+}
+
+interface IPostCampaignThumbnails extends IThumbnails, ICampaignRequestId {
 }
 
 const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
@@ -148,7 +152,7 @@ const postCampaign =
             const request = new CampaignRequest({title, subTitle, entities});
             const createdRequest = await request.save();
 
-            const {createdAt, updatedAt, _id} = createdRequest;
+            const {_id} = createdRequest;
 
             const user: UserModel | null = await User.findOne({_id: userId});
             throwUserNotFoundError(user);
@@ -169,6 +173,7 @@ const postCampaignEntity =
             throwUserNotAuthorized(req);
             const campaignRequest: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
             throwCampaignNotFoundError(campaignRequest);
+
             if (campaignRequest) {
                 if (isEntitiesValid(entityInput)) {
                     const {entities} = campaignRequest;
@@ -277,13 +282,13 @@ const postUserMaxDistance = async ({distance}: { distance: number }, req: IReque
     }
 }
 
-const addOtherCampaignGroupMember = async ({campaignRequestId}: { campaignRequestId: string }, req: IRequest) => {
+const addOtherCampaignGroupMember = async ({campaignRequestId}: ICampaignRequestId, req: IRequest) => {
     try {
         const {userId} = req;
         throwUserNotAuthorized(req);
         const campaignRequest: CampaignRequestModel | null =
             await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
-
+        throwCampaignNotFoundError(campaignRequest);
         if (campaignRequest && userId) {
             campaignRequest.groupMemberIds.push(userId);
 
@@ -299,6 +304,30 @@ const addOtherCampaignGroupMember = async ({campaignRequestId}: { campaignReques
     }
 }
 
+const postCampaignCompletionDescription =
+    async (
+        {campaignRequestId, description}: IPostCampaignDescription,
+        req: IRequest,
+    ): Promise<CampaignRequestModel | undefined> => {
+
+        try {
+            throwUserNotAuthorized(req);
+
+            const campaignRequest: CampaignRequestModel | null =
+                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+            throwCampaignNotFoundError(campaignRequest);
+
+            if (campaignRequest) {
+                campaignRequest.status = campaignRequestStatus.COMPLETED;
+                campaignRequest.description = description;
+                return await getUpdatedCampaignResponse(campaignRequest);
+            }
+
+        } catch (e) {
+            error(e.message, e.code, e.data);
+        }
+    }
+
 
 const resolver = {
     singIn,
@@ -310,6 +339,7 @@ const resolver = {
     postCampaignThumbnails,
     postUserMaxDistance,
     addOtherCampaignGroupMember,
+    postCampaignCompletionDescription,
 };
 
 export default resolver;

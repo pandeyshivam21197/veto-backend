@@ -28,6 +28,7 @@ export type CampaignRequestModel = Document & {
     donerIds: Types.ObjectId[];
     groupMemberIds: Types.ObjectId[];
     thumbnails: IThumbnail[];
+    description: string;
 };
 
 export const entityStatus = {

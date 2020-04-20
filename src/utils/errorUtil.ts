@@ -1,6 +1,12 @@
-import {IRequest} from '@Middleware/Auth';
 import {CampaignRequestModel} from '@Models/CampaignRequest';
-import User, {UserModel} from '@Models/User';
+import {UserModel} from '@Models/User';
+import {Request} from 'express';
+import {Types} from 'mongoose';
+
+export interface IRequest extends Request {
+    isAuth?: boolean;
+    userId?: Types.ObjectId;
+}
 
 export const userErrors = {
     USER_NOT_FOUND: 'User not found.',

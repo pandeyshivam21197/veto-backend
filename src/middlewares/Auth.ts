@@ -1,12 +1,7 @@
-import {error, userErrors} from '@Utils/errorUtil';
+import {error, IRequest, userErrors} from '@Utils/errorUtil';
 import {NextFunction, Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
 import {Types} from 'mongoose';
-
-export interface IRequest extends Request {
-    isAuth?: boolean;
-    userId?: Types.ObjectId;
-}
 
 interface IDecodedToken {
     email: string;
