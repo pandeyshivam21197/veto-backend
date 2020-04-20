@@ -1,5 +1,5 @@
-const userInput: string = `
-input userInput {
+const UserInput: string = `
+input UserInput {
     name: String!
     username: String!
     email: String!
@@ -12,8 +12,8 @@ input userInput {
 }
 `;
 
-const entityInput: string = `
-input entityInput {
+const EntityInput: string = `
+input EntityInput {
     title: String!
     requestedAmount: Int!
     availedAmount: Int
@@ -21,21 +21,28 @@ input entityInput {
 `;
 
 // require entity Input
-const requestInput: string = `
-input requestInput {
+const RequestInput: string = `
+input RequestInput {
     title: String!
     subTitle: String
-    entities: [entityInput]
+    entities: [EntityInput]
 }
 `;
 
-const donationEntityInput: string = `
+const DonationEntityInput: string = `
 input DonationEntityInput {
     title: String!
     amount: Int!
 }
 `;
 
-const inputTypes = {userInput, requestInput, entityInput, donationEntityInput};
+const ThumbnailsInput: string = `
+input ThumbnailsInput{
+    url: String!
+    type: String!
+    }
+`;
+
+const inputTypes = {UserInput, RequestInput, EntityInput, DonationEntityInput, ThumbnailsInput};
 
 export default inputTypes;

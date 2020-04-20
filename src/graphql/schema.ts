@@ -2,20 +2,21 @@ import inputTypes from '@Graphql/types/inputTypes';
 import responseTypes from '@Graphql/types/responseTypes';
 import {buildSchema, GraphQLSchema} from 'graphql';
 
-const {userInput, requestInput, entityInput, donationEntityInput} = inputTypes;
-const {CampaignRequest, User, DonationHistory, entity, Thumbnails} = responseTypes;
+const {UserInput, RequestInput, EntityInput, DonationEntityInput, ThumbnailsInput} = inputTypes;
+const {CampaignRequest, User, DonationHistory, Entity, ThumbnailsType} = responseTypes;
 
 // post Schema - create the data and post to data base (POST, PUT , DELETE, PATCH)
 const source = `
-${entity}
-${userInput}
-${Thumbnails}
+${Entity}
+${UserInput}
+${ThumbnailsInput}
+${ThumbnailsType}
 ${CampaignRequest}
 ${DonationHistory}
 ${User}
-${entityInput}
-${requestInput}
-${donationEntityInput}
+${EntityInput}
+${RequestInput}
+${DonationEntityInput}
 
 type AuthResponse {
 token: String!
@@ -28,17 +29,16 @@ password: String!
 }
 
  type RootMutation {
-    singIn(userInput: userInput!): User!
+    singIn(userInput: UserInput!): User!
     login(loginInput: loginInput!): AuthResponse!
-    postCampaign(requestInput: requestInput!): CampaignRequest!
-    postCampaignEntity(campaignRequestId: String!, entityInput: [entityInput]!): CampaignRequest!
+    postCampaign(requestInput: RequestInput!): CampaignRequest!
+    postCampaignEntity(campaignRequestId: String!, entityInput: [EntityInput]!): CampaignRequest!
     postCampaignDonation(campaignRequestId: String!, entity: DonationEntityInput!): CampaignRequest!
-    postCampaignThumbnails(campaignRequestId: String!, thumbnails: Thumbnails): CampaignRequest!
+    postCampaignThumbnails(campaignRequestId: String!, thumbnails: ThumbnailsInput!): CampaignRequest!
     addOtherCampaignGroupMember(campaignRequestId: String!): User!
     postCampaignCompletionDescription(campaignRequestId: String!, description: String!): CampaignRequest!
     postUserRewards(points: Int!): User!
     postUserMaxDistance(distance: Int!): User!
-
     getRequestedCampaign(campaignRequestId: String!): CampaignRequest!
     }
 

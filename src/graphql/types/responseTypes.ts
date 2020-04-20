@@ -11,20 +11,13 @@ type DonationHistory {
 }
 `;
 
-const entity: string = `
-type entity {
+const Entity: string = `
+type Entity {
     title: String!
     requestedAmount: Int!
     availedAmount: Int!
     currentPrice: String!
     status: String!
-    }
-`;
-
-const Thumbnails: string = `
-type Thumbnails {
-    url: String!
-    type: String!
     }
 `;
 
@@ -34,7 +27,7 @@ type CampaignRequest {
      _id: ID!
     title: String!
     subTitle: String!
-    entities: [entity]!
+    entities: [Entity]!
     status: String!
     creatorId: User!
     donerIds: [User]!
@@ -67,6 +60,13 @@ type User {
 }
 `;
 
-const responseTypes = {User, CampaignRequest, DonationHistory, entity, Thumbnails};
+const ThumbnailsType: string = `
+type Thumbnails{
+    url: String!
+    type: String!
+    }
+`;
+
+const responseTypes = {User, CampaignRequest, DonationHistory, Entity, ThumbnailsType};
 
 export default responseTypes;
