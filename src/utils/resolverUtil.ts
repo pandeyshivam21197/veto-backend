@@ -85,14 +85,23 @@ export const getCampaignStatus = (campaignRequest: CampaignRequestModel): string
     return isAllEntitiesAvailed ? campaignRequestStatus.AVAILED : status;
 }
 
-export const updateUserProperty = async (property = {}, userId: Types.ObjectId | undefined) => {
-    let user: UserModel | null = await User.findOne({_id: userId});
+export const updateUserProperty = async (property = {}, userId: Types.ObjectId | undefined, isOldValueRequired = false) => {
+    const user: UserModel | null = await User.findOne({_id: userId});
     throwUserNotFoundError(user);
     // @ts-ignore
-    user = {...user, ...property};
     if (user) {
+        const key: string = Object.keys(property)[0];
+        // @ts-ignore
+        let value = property[key];
+        if (isOldValueRequired) {
+            // @ts-ignore
+            const oldPropertyValue: any = user[key];
+            // @ts-ignore
+            value = oldPropertyValue + value;
+        }
+        // @ts-ignore
+        user[key] = value;
         const updatedUser = await user.save();
-
         const {createdAt, updatedAt, _id} = updatedUser;
 
         return {
@@ -103,7 +112,6 @@ export const updateUserProperty = async (property = {}, userId: Types.ObjectId |
             _id: _id.toString(),
         }
     }
-
 }
 
 export const getUpdatedCampaignResponse = async (campaignRequest: CampaignRequestModel) => {
@@ -118,7 +126,7 @@ export const getUpdatedCampaignResponse = async (campaignRequest: CampaignReques
     };
 };
 
-export const getUpdatedUserResponse = async (user: UserModel) => {
+export const getUpdatedUserResponse = (user: UserModel) => {
     const {createdAt, updatedAt, _id} = user;
 
     return {
@@ -128,16 +136,6 @@ export const getUpdatedUserResponse = async (user: UserModel) => {
         updatedAt: updatedAt.toString(),
         _id: _id.toString(),
     };
-};
-
-// TODO: add lookup similar to populate
-export const getStatusSortedCampaigns = () => {
-    const {COMPLETED, INITIATED, AVAILED} = campaignRequestStatus;
-    return CampaignRequest.aggregate([
-        {$group: {$match: {status: COMPLETED}, $sort: {createdAt: -1}}},
-        {$group: {$match: {status: AVAILED}, $sort: {createdAt: -1}}},
-        {$group: {$match: {status: INITIATED}, $sort: {createdAt: -1}}},
-    ])
 };
 
 export const isUserAlreadyJoined = (userIds: Types.ObjectId[], newUserId: Types.ObjectId) => {

@@ -1,22 +1,30 @@
-import CampaignRequest, {IDonationEntity} from '@Models/CampaignRequest';
-import {CampaignRequestModel, campaignRequestStatus, IEntity, IThumbnail} from '@Models/CampaignRequest';
+import CampaignRequest, {
+    CampaignRequestModel,
+    campaignRequestStatus,
+    IDonationEntity,
+    IEntity,
+    IThumbnail
+} from '@Models/CampaignRequest';
 import User, {UserModel} from '@Models/User';
 import {
     error,
-    IMessage, IRequest,
+    IMessage,
+    IRequest,
     throwCampaignNotFoundError,
     throwUserNotAuthorized,
     throwUserNotFoundError,
     userErrors,
 } from '@Utils/errorUtil';
 import {
-    isUserAlreadyJoined,
-    getCampaignStatus, getStatusSortedCampaigns,
-    getUpdatedCampaignResponse, getUpdatedEntities,
+    getCampaignStatus,
+    getUpdatedCampaignResponse,
+    getUpdatedEntities,
     getUpdatedUserResponse,
     isEntitiesValid,
+    isUserAlreadyJoined,
     setThumbnailsType,
-    updateEntityAmount, updateUserProperty,
+    updateEntityAmount,
+    updateUserProperty,
 } from '@Utils/resolverUtil';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -71,6 +79,8 @@ interface IPostCampaignDescription extends ICampaignRequestId {
 
 interface IPostCampaignThumbnails extends IThumbnails, ICampaignRequestId {
 }
+
+const pageLimit: number = 10;
 
 const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
     try {
@@ -264,7 +274,7 @@ const postUserRewards = async ({points}: IPostUserRewards, req: IRequest): Promi
     const {userId} = req;
     try {
         throwUserNotAuthorized(req);
-        return await updateUserProperty({rewardPoints: points}, userId);
+        return await updateUserProperty({rewardPoints: points}, userId, true);
     } catch (e) {
         error(e.message, e.code, e.data);
     }
@@ -314,7 +324,7 @@ const addCampaignGroupMember =
                 }
 
                 const {_id, groupMemberIds} = campaignRequest;
-                if(isUserAlreadyJoined(groupMemberIds, userId)) {
+                if (isUserAlreadyJoined(groupMemberIds, userId)) {
                     error(userErrors.USER_ALREADY_EXISTED, 400, {message: 'user already joined the group'});
                 }
 
@@ -352,11 +362,11 @@ const postCampaignCompletionDescription =
                 await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
             throwCampaignNotFoundError(campaignRequest);
             // check is the campaign creator allowed
-            if (campaignRequest && campaignRequest.creatorId === userId) {
+            if (campaignRequest && userId && campaignRequest.creatorId.toString() === userId.toString()) {
                 campaignRequest.status = campaignRequestStatus.COMPLETED;
                 campaignRequest.description = description;
+
                 const updatedCampaign = await campaignRequest.save();
-                console.log(updatedCampaign, 'updatedCampaign!!');
                 await updatedCampaign.populate('groupMemberIds').execPopulate();
 
                 return getUpdatedCampaignResponse(updatedCampaign);
@@ -368,32 +378,28 @@ const postCampaignCompletionDescription =
         }
     }
 
-const getCampaignRequests = (req: IRequest) => {
+const getCampaignRequests = async ({page}: { page: number }, req: IRequest) => {
     try {
+        // TODO: add lookup similar to populate
         throwUserNotAuthorized(req);
-        return getStatusSortedCampaigns();
+        return CampaignRequest
+            .aggregate([
+                {$sort: {createdAt: -1}},
+            ]);
     } catch (e) {
         error(e.message, e.code, e.data);
     }
 }
 
-const getUserData = async (req: IRequest) => {
+const getUserData = async (args: any, req: IRequest) => {
     try {
         const {userId} = req;
-        throwUserNotAuthorized(req);
 
         const user: UserModel | null = await User.findOne({_id: userId});
         throwUserNotFoundError(user);
         if (user) {
-            const {createdAt, updatedAt, _id} = user;
-
-            return {
-                // @ts-ignore
-                ...user._doc,
-                createdAt: createdAt.toString(),
-                updatedAt: updatedAt.toString(),
-                _id: _id.toString(),
-            };
+            // TODO add populate
+            return getUpdatedUserResponse(user);
         }
     } catch (e) {
         error(e.message, e.code, e.data);

@@ -43,9 +43,9 @@ export const thumbnailType = {
 }
 
 export const campaignRequestStatus = {
-    INITIATED: 'Initiated',
-    AVAILED: 'Availed',
     COMPLETED: 'Completed',
+    AVAILED: 'Availed',
+    INITIATED: 'Initiated',
 };
 
 export const imageTypes = ['jpeg', 'jpg', 'png', 'gif', 'tiff'];

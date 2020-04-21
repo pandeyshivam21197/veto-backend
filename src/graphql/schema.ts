@@ -40,10 +40,11 @@ password: String!
     postUserRewards(points: Int!): User!
     postUserMaxDistance(distance: Int!): User!
     getRequestedCampaign(campaignRequestId: String!): CampaignRequest!
+    getCampaignRequests(page: Int!): [CampaignRequest]!
+
     }
 
     type RootQuery {
-    getCampaignRequests: [CampaignRequest]!
     getUserData: User!
     }
 
