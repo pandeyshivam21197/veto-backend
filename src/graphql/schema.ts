@@ -34,8 +34,8 @@ password: String!
     postCampaign(requestInput: RequestInput!): CampaignRequest!
     postCampaignEntity(campaignRequestId: String!, entityInput: [EntityInput]!): CampaignRequest!
     postCampaignDonation(campaignRequestId: String!, entity: DonationEntityInput!): CampaignRequest!
-    postCampaignThumbnails(campaignRequestId: String!, thumbnails: ThumbnailsInput!): CampaignRequest!
-    addOtherCampaignGroupMember(campaignRequestId: String!): User!
+    postCampaignThumbnails(campaignRequestId: String!, thumbnails: [ThumbnailsInput]!): CampaignRequest!
+    addCampaignGroupMember(campaignRequestId: String!): CampaignRequest!
     postCampaignCompletionDescription(campaignRequestId: String!, description: String!): CampaignRequest!
     postUserRewards(points: Int!): User!
     postUserMaxDistance(distance: Int!): User!

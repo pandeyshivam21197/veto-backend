@@ -17,7 +17,7 @@ export type UserModel = Document & {
     contactNumber: string;
     rewardPoints: number;
     campaignRequestIds: [Types.ObjectId];
-    otherCampaignRequestIds: [Types.ObjectId];
+    joinedCampaignIds: [Types.ObjectId];
     donationHistory: IDonationHistory[];
     maxDistance: number;
     createdAt: string;
@@ -81,7 +81,7 @@ const userSchema: Schema = new Schema({
         ref: 'CampaignRequest',
         default: [],
     },
-    otherCampaignRequestIds: {
+    joinedCampaignIds: {
         type: [Schema.Types.ObjectId],
         ref: 'CampaignRequest',
         default: [],

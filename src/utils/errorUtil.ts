@@ -10,6 +10,8 @@ export interface IRequest extends Request {
 
 export const userErrors = {
     USER_NOT_FOUND: 'User not found.',
+    USER_ALREADY_EXISTED: 'User already exist.',
+    USER_CANT_BE_MEMBER: 'User cant be the member of its own campaign.',
     USR_NOT_AUTHORIZED: 'User is not authorized',
     INCORRECT_PASSWORD: 'Password is incorrect.',
     SECRET_KEY_ERROR: 'Secret key not found.',

@@ -10,6 +10,7 @@ import {
     userErrors,
 } from '@Utils/errorUtil';
 import {
+    isUserAlreadyJoined,
     getCampaignStatus, getStatusSortedCampaigns,
     getUpdatedCampaignResponse, getUpdatedEntities,
     getUpdatedUserResponse,
@@ -90,6 +91,12 @@ const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
             error(userErrors.BAD_REQUEST, 400, errors);
         }
 
+        const existedUser: UserModel | null = await User.findOne({$or: [{email}, {username: email}]});
+
+        if (existedUser) {
+            error(userErrors.USER_ALREADY_EXISTED, 401, {message: 'please use different username or email'});
+        }
+
         const user = new User(
             {
                 username,
@@ -103,7 +110,9 @@ const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
                 contactNumber,
             },
         );
-        return await getUpdatedUserResponse(user);
+        await user.save();
+
+        return getUpdatedUserResponse(user);
     } catch (e) {
         error(e.message, e.code, e.data);
     }
@@ -112,7 +121,7 @@ const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
 const login = async ({loginInput}: ILogin): Promise<ILoginResponse | void> => {
     try {
         const {email, password} = loginInput;
-        const user: UserModel | null = await User.findOne({email} || {username: email});
+        const user: UserModel | null = await User.findOne({$or: [{email}, {username: email}]});
         throwUserNotFoundError(user);
         if (user) {
             const isEqual: boolean = await bcrypt.compare(password, user.password);
@@ -160,8 +169,10 @@ const postCampaign =
                 user.campaignRequestIds.push(_id);
                 createdRequest.creatorId = user._id;
                 const updatedCampaign = await createdRequest.save();
+                // populates the creator id
+                await updatedCampaign.populate('creatorId').execPopulate();
 
-                return await getUpdatedCampaignResponse(updatedCampaign);
+                return getUpdatedCampaignResponse(updatedCampaign);
             }
         } catch (e) {
             error(e.message, e.code, e.data);
@@ -188,7 +199,9 @@ const postCampaignEntity =
                     }
 
                     campaignRequest.entities = newEntities;
-                    return await getUpdatedCampaignResponse(campaignRequest);
+                    const updatedCampaign = await campaignRequest.save();
+
+                    return getUpdatedCampaignResponse(updatedCampaign);
                 }
             } else {
                 error(userErrors.BAD_REQUEST, 400, {message: 'Please add valid requestedAmount'});
@@ -231,16 +244,15 @@ const postCampaignDonation =
                 throwCampaignNotFoundError(campaignRequest);
                 if (campaignRequest) {
                     const {donerIds, entities} = campaignRequest;
-                    const donerId = Types.ObjectId(user._id);
-
                     // Decrease Campaign entity amount and set status if done
                     campaignRequest.entities = updateEntityAmount(entity, entities);
                     // Sets doners id to campaign request
-                    campaignRequest.donerIds = [...donerIds, donerId];
+                    campaignRequest.donerIds = [...donerIds, user._id];
                     // Sets campaign status if done
                     campaignRequest.status = getCampaignStatus(campaignRequest);
+                    const updatedCampaign = await campaignRequest.save();
 
-                    return await getUpdatedCampaignResponse(campaignRequest);
+                    return getUpdatedCampaignResponse(updatedCampaign);
                 }
             }
         } catch (e) {
@@ -267,8 +279,9 @@ const postCampaignThumbnails = async ({campaignRequestId, thumbnails}: IPostCamp
         throwCampaignNotFoundError(campaignRequest);
         if (campaignRequest) {
             campaignRequest.thumbnails = setThumbnailsType(campaignRequest.thumbnails, thumbnails);
+            const updatedCampaign = await campaignRequest.save();
 
-            return await getUpdatedCampaignResponse(campaignRequest);
+            return getUpdatedCampaignResponse(updatedCampaign);
         }
     } catch (e) {
         error(e.message, e.code, e.data);
@@ -285,27 +298,45 @@ const postUserMaxDistance = async ({distance}: { distance: number }, req: IReque
     }
 }
 
-const addOtherCampaignGroupMember = async ({campaignRequestId}: ICampaignRequestId, req: IRequest) => {
-    try {
-        const {userId} = req;
-        throwUserNotAuthorized(req);
-        const campaignRequest: CampaignRequestModel | null =
-            await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
-        throwCampaignNotFoundError(campaignRequest);
-        if (campaignRequest && userId) {
-            campaignRequest.groupMemberIds.push(userId);
+const addCampaignGroupMember =
+    async ({campaignRequestId}: ICampaignRequestId, req: IRequest): Promise<CampaignRequestModel | undefined> => {
+// other people wants to join someone else campaign.
+        try {
+            const {userId} = req;
+            throwUserNotAuthorized(req);
+            const campaignRequest: CampaignRequestModel | null =
+                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+            throwCampaignNotFoundError(campaignRequest);
+            if (campaignRequest && userId) {
+                // creator cant be the joined member of campaign
+                if (campaignRequest.creatorId === userId) {
+                    error(userErrors.USER_CANT_BE_MEMBER, 400);
+                }
 
-            const user: UserModel | null = await User.findOne({_id: userId});
-            throwUserNotFoundError(user);
-            if (user) {
-                user.otherCampaignRequestIds.push(campaignRequest._id);
-                return await getUpdatedUserResponse(user);
+                const {_id, groupMemberIds} = campaignRequest;
+                if(isUserAlreadyJoined(groupMemberIds, userId)) {
+                    error(userErrors.USER_ALREADY_EXISTED, 400, {message: 'user already joined the group'});
+                }
+
+                // push the userId of joined members
+                campaignRequest.groupMemberIds = [...groupMemberIds, userId];
+                const user: UserModel | null = await User.findOne({_id: userId});
+                throwUserNotFoundError(user);
+                if (user) {
+                    // update the joined member the campaign he/she joined
+                    user.joinedCampaignIds.push(_id);
+                    await user.save();
+                }
+                const updatedCampaign = await campaignRequest.save();
+                await updatedCampaign.populate('groupMemberIds').execPopulate();
+                console.log(updatedCampaign, 'updatedCampaign$$$');
+
+                return getUpdatedCampaignResponse(updatedCampaign);
             }
+        } catch (e) {
+            error(e.message, e.code, e.data);
         }
-    } catch (e) {
-        error(e.message, e.code, e.data);
     }
-}
 
 const postCampaignCompletionDescription =
     async (
@@ -324,7 +355,11 @@ const postCampaignCompletionDescription =
             if (campaignRequest && campaignRequest.creatorId === userId) {
                 campaignRequest.status = campaignRequestStatus.COMPLETED;
                 campaignRequest.description = description;
-                return await getUpdatedCampaignResponse(campaignRequest);
+                const updatedCampaign = await campaignRequest.save();
+                console.log(updatedCampaign, 'updatedCampaign!!');
+                await updatedCampaign.populate('groupMemberIds').execPopulate();
+
+                return getUpdatedCampaignResponse(updatedCampaign);
             } else {
                 error(userErrors.USR_NOT_AUTHORIZED, 403, {message: 'Only campaign creator allowed.'})
             }
@@ -365,21 +400,25 @@ const getUserData = async (req: IRequest) => {
     }
 }
 
-const getRequestedCampaign = async ({campaignRequestId}: ICampaignRequestId, req: IRequest) => {
-    try {
-        throwUserNotAuthorized(req);
-        const campaignRequest: CampaignRequestModel | null =
-            await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
-        throwCampaignNotFoundError(campaignRequest);
+const getRequestedCampaign =
+    async ({campaignRequestId}: ICampaignRequestId, req: IRequest): Promise<CampaignRequestModel | undefined> => {
 
-        if (campaignRequest) {
-            return await getUpdatedCampaignResponse(campaignRequest);
+        try {
+            throwUserNotAuthorized(req);
+            const campaignRequest: CampaignRequestModel | null =
+                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+            throwCampaignNotFoundError(campaignRequest);
+
+            if (campaignRequest) {
+                const updatedCampaign = await campaignRequest.save();
+
+                return getUpdatedCampaignResponse(updatedCampaign);
+            }
+        } catch (e) {
+            error(e.message, e.code, e.data);
+
         }
-    } catch (e) {
-        error(e.message, e.code, e.data);
-
     }
-}
 // TODO: add populate to all the resolver
 
 const resolver = {
@@ -391,7 +430,7 @@ const resolver = {
     postUserRewards,
     postCampaignThumbnails,
     postUserMaxDistance,
-    addOtherCampaignGroupMember,
+    addCampaignGroupMember,
     postCampaignCompletionDescription,
     getCampaignRequests,
     getUserData,

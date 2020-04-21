@@ -17,6 +17,8 @@ input EntityInput {
     title: String!
     requestedAmount: Int!
     availedAmount: Int
+    currentPrice: String!
+    status: String
     }
 `;
 
@@ -39,7 +41,7 @@ input DonationEntityInput {
 const ThumbnailsInput: string = `
 input ThumbnailsInput{
     url: String!
-    type: String!
+    type: String
     }
 `;
 

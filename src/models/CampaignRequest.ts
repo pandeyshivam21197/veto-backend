@@ -33,6 +33,7 @@ export type CampaignRequestModel = Document & {
 };
 
 export const entityStatus = {
+    INITIATED: 'Initiated',
     AVAILED: 'Availed',
 };
 
@@ -79,8 +80,13 @@ const entity = {
     },
     status: {
         type: String,
-        default: '',
+        default: entityStatus.INITIATED,
     },
+};
+
+const userRef = {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
 };
 
 const campaignRequestSchema: Schema = new Schema({
@@ -103,16 +109,13 @@ const campaignRequestSchema: Schema = new Schema({
     creatorId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-        default: '',
     },
     donerIds: {
-        type: [Schema.Types.ObjectId],
-        ref: 'User',
+        type: [userRef],
         default: [],
     },
     groupMemberIds: {
-        type: [Schema.Types.ObjectId],
-        ref: 'User',
+        type: [userRef],
         default: [],
     },
     thumbnails: {

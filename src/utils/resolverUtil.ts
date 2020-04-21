@@ -31,7 +31,7 @@ export const getUpdatedEntities = (oldEntities: IEntity[], newEntities: IEntity[
                     (newEntity: IEntity) => newEntity.title.toLowerCase() === entity.title.toLowerCase(),
                 );
 
-        if (index >= 0) {
+        if (foundIndex >= 0) {
             const oldAmount = oldEntities[index].requestedAmount;
             const additionAmount = newEntities[foundIndex].requestedAmount;
             oldEntities[index].requestedAmount = oldAmount + additionAmount;
@@ -43,17 +43,24 @@ export const getUpdatedEntities = (oldEntities: IEntity[], newEntities: IEntity[
 
 export const updateEntityAmount = (donationEntity: IDonationEntity, entities: IEntity[]): IEntity[] => {
     const {title, amount} = donationEntity;
-    const foundIndex = entities.findIndex((entity: IEntity) => entity.title === title);
+    const foundIndex: number = entities.findIndex((entity: IEntity) => {
+        return entity.title.trim().toLowerCase() === title.trim().toLowerCase();
+    });
     if (foundIndex > -1) {
-        const foundEntity: IEntity = entities[foundIndex];
-        const {availedAmount, requestedAmount} = foundEntity;
-        if (availedAmount === requestedAmount) {
+        // @ts-ignore
+        const foundEntity: IEntity = entities[foundIndex]._doc;
+        const {availedAmount, requestedAmount, status} = foundEntity;
+        // check if its already availed or not
+        if (availedAmount === requestedAmount || status === entityStatus.AVAILED) {
             error(campaignRequestError.BAD_REQUEST, 403, {message: `entity ${title} is already availed.`});
         }
+        // set availed amount
         const updatedEntity: IEntity = {...foundEntity, availedAmount: availedAmount + amount};
+        // after setting entity availed again is it now availed or not
         if (updatedEntity.availedAmount === updatedEntity.requestedAmount) {
             updatedEntity.status = entityStatus.AVAILED;
         }
+        // replace the updated entity
         entities.splice(foundIndex, 1, updatedEntity);
     }
     return entities;
@@ -100,12 +107,11 @@ export const updateUserProperty = async (property = {}, userId: Types.ObjectId |
 }
 
 export const getUpdatedCampaignResponse = async (campaignRequest: CampaignRequestModel) => {
-    const updatedCampaign = await campaignRequest.save();
-    const {createdAt, updatedAt, _id} = updatedCampaign;
+    const {createdAt, updatedAt, _id} = campaignRequest;
 
     return {
         // @ts-ignore
-        ...updatedCampaign._doc,
+        ...campaignRequest._doc,
         createdAt: createdAt.toString(),
         updatedAt: updatedAt.toString(),
         _id: _id.toString(),
@@ -113,12 +119,11 @@ export const getUpdatedCampaignResponse = async (campaignRequest: CampaignReques
 };
 
 export const getUpdatedUserResponse = async (user: UserModel) => {
-    const updatedUser = await user.save();
-    const {createdAt, updatedAt, _id} = updatedUser;
+    const {createdAt, updatedAt, _id} = user;
 
     return {
         // @ts-ignore
-        ...updatedUser._doc,
+        ...user._doc,
         createdAt: createdAt.toString(),
         updatedAt: updatedAt.toString(),
         _id: _id.toString(),
@@ -133,4 +138,8 @@ export const getStatusSortedCampaigns = () => {
         {$group: {$match: {status: AVAILED}, $sort: {createdAt: -1}}},
         {$group: {$match: {status: INITIATED}, $sort: {createdAt: -1}}},
     ])
+};
+
+export const isUserAlreadyJoined = (userIds: Types.ObjectId[], newUserId: Types.ObjectId) => {
+    return userIds.find((userId: Types.ObjectId) => userId.toString() === newUserId.toString());
 };

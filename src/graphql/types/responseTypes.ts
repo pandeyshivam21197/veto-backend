@@ -53,7 +53,7 @@ type User {
     contactNumber: String!
     rewardPoints: Int!
     campaignRequestIds: [CampaignRequest]!
-    otherCampaignRequestIds: [CampaignRequest]!
+    joinedCampaignIds: [CampaignRequest]!
     donationHistory: [DonationHistory]!
     maxDistance: Int!
     ${timeStamp}
