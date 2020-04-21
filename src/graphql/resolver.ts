@@ -21,8 +21,10 @@ import {
     getUpdatedEntities,
     getUpdatedUserResponse,
     isEntitiesValid,
-    isUserAlreadyJoined, setCampaignPopulate,
-    setThumbnailsType, setUserPopulate,
+    isUserAlreadyJoined,
+    setCampaignPopulate,
+    setThumbnailsType,
+    setUserPopulate,
     updateEntityAmount,
     updateUserProperty,
 } from '@Utils/resolverUtil';
@@ -377,12 +379,23 @@ const postCampaignCompletionDescription =
 
 const getCampaignRequests = async ({page}: { page: number }, req: IRequest) => {
     try {
-        // TODO: add lookup similar to populate
         throwUserNotAuthorized(req);
-        return CampaignRequest
+        return await CampaignRequest
             .aggregate([
                 {$sort: {createdAt: -1}},
-            ]);
+                {$lookup: {from: User.collection.name, localField: 'creatorId', foreignField: '_id', as: 'creatorId'}},
+                {$set: {creatorId: {$arrayElemAt: ['$creatorId', 0]}}},
+                {$lookup: {from: User.collection.name, localField: 'donerIds', foreignField: '_id', as: 'donerIds'}},
+                {
+                    $lookup: {
+                        from: User.collection.name,
+                        localField: 'groupMemberIds',
+                        foreignField: '_id',
+                        as: 'groupMemberIds',
+                    },
+                },
+                // @ts-ignore
+            ], (err: string, campaigns: CampaignRequestModel) => campaigns._doc);
     } catch (e) {
         error(e.message, e.code, e.data);
     }
