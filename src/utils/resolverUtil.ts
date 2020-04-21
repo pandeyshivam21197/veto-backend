@@ -102,7 +102,8 @@ export const updateUserProperty = async (property = {}, userId: Types.ObjectId |
         // @ts-ignore
         user[key] = value;
         const updatedUser = await user.save();
-        const {createdAt, updatedAt, _id} = updatedUser;
+
+        const {createdAt, updatedAt, _id} = await setUserPopulate(updatedUser);
 
         return {
             // @ts-ignore

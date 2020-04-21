@@ -21,8 +21,8 @@ import {
     getUpdatedEntities,
     getUpdatedUserResponse,
     isEntitiesValid,
-    isUserAlreadyJoined,
-    setThumbnailsType,
+    isUserAlreadyJoined, setCampaignPopulate,
+    setThumbnailsType, setUserPopulate,
     updateEntityAmount,
     updateUserProperty,
 } from '@Utils/resolverUtil';
@@ -179,11 +179,8 @@ const postCampaign =
                 user.campaignRequestIds.push(_id);
                 createdRequest.creatorId = user._id;
                 const updatedCampaign = await createdRequest.save();
-                // populates the creator id
-                await updatedCampaign.populate('creatorId').execPopulate();
-                // TODO add populate
 
-                return getUpdatedCampaignResponse(updatedCampaign);
+                return getUpdatedCampaignResponse(await setCampaignPopulate(updatedCampaign));
             }
         } catch (e) {
             error(e.message, e.code, e.data);
@@ -212,9 +209,8 @@ const postCampaignEntity =
 
                     campaignRequest.entities = newEntities;
                     const updatedCampaign = await campaignRequest.save();
-                    // TODO add populate
 
-                    return getUpdatedCampaignResponse(updatedCampaign);
+                    return getUpdatedCampaignResponse(await setCampaignPopulate(updatedCampaign));
                 }
             } else {
                 error(userErrors.BAD_REQUEST, 400, {message: 'Please add valid requestedAmount'});
@@ -264,9 +260,8 @@ const postCampaignDonation =
                     // Sets campaign status if done
                     campaignRequest.status = getCampaignStatus(campaignRequest);
                     const updatedCampaign = await campaignRequest.save();
-                    // TODO add populate
 
-                    return getUpdatedCampaignResponse(updatedCampaign);
+                    return getUpdatedCampaignResponse(await setCampaignPopulate(updatedCampaign));
                 }
             }
         } catch (e) {
@@ -278,7 +273,6 @@ const postUserRewards = async ({points}: IPostUserRewards, req: IRequest): Promi
     const {userId} = req;
     try {
         throwUserNotAuthorized(req);
-        // TODO add populate
 
         return await updateUserProperty({rewardPoints: points}, userId, true);
     } catch (e) {
@@ -296,10 +290,8 @@ const postCampaignThumbnails = async ({campaignRequestId, thumbnails}: IPostCamp
         if (campaignRequest) {
             campaignRequest.thumbnails = setThumbnailsType(campaignRequest.thumbnails, thumbnails);
             const updatedCampaign = await campaignRequest.save();
-            // TODO add populate
 
-
-            return getUpdatedCampaignResponse(updatedCampaign);
+            return getUpdatedCampaignResponse(await setCampaignPopulate(updatedCampaign));
         }
     } catch (e) {
         error(e.message, e.code, e.data);
@@ -346,11 +338,8 @@ const addCampaignGroupMember =
                     await user.save();
                 }
                 const updatedCampaign = await campaignRequest.save();
-                // TODO add populate
 
-                await updatedCampaign.populate('groupMemberIds').execPopulate();
-
-                return getUpdatedCampaignResponse(updatedCampaign);
+                return getUpdatedCampaignResponse(await setCampaignPopulate(updatedCampaign));
             }
         } catch (e) {
             error(e.message, e.code, e.data);
@@ -376,10 +365,8 @@ const postCampaignCompletionDescription =
                 campaignRequest.description = description;
 
                 const updatedCampaign = await campaignRequest.save();
-                // TODO add populate
-                await updatedCampaign.populate('groupMemberIds').execPopulate();
 
-                return getUpdatedCampaignResponse(updatedCampaign);
+                return getUpdatedCampaignResponse(await setCampaignPopulate(updatedCampaign));
             } else {
                 error(userErrors.USR_NOT_AUTHORIZED, 403, {message: 'Only campaign creator allowed.'})
             }
@@ -408,8 +395,7 @@ const getUserData = async (args: any, req: IRequest) => {
         const user: UserModel | null = await User.findOne({_id: userId}).exec();
         throwUserNotFoundError(user);
         if (user) {
-            // TODO add populate
-            return getUpdatedUserResponse(user);
+            return getUpdatedUserResponse(await setUserPopulate(user));
         }
     } catch (e) {
         error(e.message, e.code, e.data);
@@ -427,16 +413,14 @@ const getRequestedCampaign =
 
             if (campaignRequest) {
                 const updatedCampaign = await campaignRequest.save();
-                // TODO add populate
 
-                return getUpdatedCampaignResponse(updatedCampaign);
+                return getUpdatedCampaignResponse(await setCampaignPopulate(updatedCampaign));
             }
         } catch (e) {
             error(e.message, e.code, e.data);
 
         }
-    }
-// TODO: add populate to all the resolver
+    };
 
 const resolver = {
     singIn,
