@@ -7,6 +7,7 @@ import CampaignRequest, {
 } from '@Models/CampaignRequest';
 import User, {UserModel} from '@Models/User';
 import {
+    campaignRequestError,
     error,
     IMessage,
     IRequest,
@@ -379,10 +380,16 @@ const postCampaignCompletionDescription =
 
 const getCampaignRequests = async ({page}: { page: number }, req: IRequest) => {
     try {
+        if(page<1) {
+            error(campaignRequestError.INVALID_PAGE_NO, 400);
+        }
+        const skipNumber: number = (page - 1) * pageLimit;
         throwUserNotAuthorized(req);
         return await CampaignRequest
             .aggregate([
                 {$sort: {createdAt: -1}},
+                {$skip: skipNumber},
+                {$limit: pageLimit},
                 {$lookup: {from: User.collection.name, localField: 'creatorId', foreignField: '_id', as: 'creatorId'}},
                 {$set: {creatorId: {$arrayElemAt: ['$creatorId', 0]}}},
                 {$lookup: {from: User.collection.name, localField: 'donerIds', foreignField: '_id', as: 'donerIds'}},

@@ -23,6 +23,7 @@ export const userErrors = {
 
 export const campaignRequestError = {
     BAD_REQUEST: 'Unable to set, please check params',
+    INVALID_PAGE_NO: 'Invalid page no, should be more than 0',
 }
 
 export interface ErrorType extends Error {
