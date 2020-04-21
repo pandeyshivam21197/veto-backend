@@ -3,7 +3,7 @@ import CampaignRequest, {
     campaignRequestStatus,
     IDonationEntity,
     IEntity,
-    IThumbnail
+    IThumbnail,
 } from '@Models/CampaignRequest';
 import User, {UserModel} from '@Models/User';
 import {
@@ -101,7 +101,7 @@ const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
             error(userErrors.BAD_REQUEST, 400, errors);
         }
 
-        const existedUser: UserModel | null = await User.findOne({$or: [{email}, {username: email}]});
+        const existedUser: UserModel | null = await User.findOne({$or: [{email}, {username: email}]}).exec();
 
         if (existedUser) {
             error(userErrors.USER_ALREADY_EXISTED, 401, {message: 'please use different username or email'});
@@ -131,7 +131,7 @@ const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
 const login = async ({loginInput}: ILogin): Promise<ILoginResponse | void> => {
     try {
         const {email, password} = loginInput;
-        const user: UserModel | null = await User.findOne({$or: [{email}, {username: email}]});
+        const user: UserModel | null = await User.findOne({$or: [{email}, {username: email}]}).exec();
         throwUserNotFoundError(user);
         if (user) {
             const isEqual: boolean = await bcrypt.compare(password, user.password);
@@ -173,7 +173,7 @@ const postCampaign =
 
             const {_id} = createdRequest;
 
-            const user: UserModel | null = await User.findOne({_id: userId});
+            const user: UserModel | null = await User.findOne({_id: userId}).exec();
             throwUserNotFoundError(user);
             if (user) {
                 user.campaignRequestIds.push(_id);
@@ -196,7 +196,8 @@ const postCampaignEntity =
     ): Promise<CampaignRequestModel | undefined> => {
         try {
             throwUserNotAuthorized(req);
-            const campaignRequest: CampaignRequestModel | null = await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+            const campaignRequest: CampaignRequestModel | null =
+                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)}).exec();
             throwCampaignNotFoundError(campaignRequest);
 
             if (campaignRequest) {
@@ -232,7 +233,7 @@ const postCampaignDonation =
             const {userId} = req;
             throwUserNotAuthorized(req);
             const {amount} = entity;
-            const user: UserModel | null = await User.findOne({_id: userId});
+            const user: UserModel | null = await User.findOne({_id: userId}).exec();
             throwUserNotFoundError(user);
             // Set user donation history to a particular Campaign Request
             if (user) {
@@ -251,7 +252,7 @@ const postCampaignDonation =
                 await user.save();
 
                 const campaignRequest: CampaignRequestModel | null =
-                    await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+                    await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)}).exec();
 
                 throwCampaignNotFoundError(campaignRequest);
                 if (campaignRequest) {
@@ -289,7 +290,7 @@ const postCampaignThumbnails = async ({campaignRequestId, thumbnails}: IPostCamp
     try {
         throwUserNotAuthorized(req);
         const campaignRequest: CampaignRequestModel | null =
-            await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+            await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)}).exec();
 
         throwCampaignNotFoundError(campaignRequest);
         if (campaignRequest) {
@@ -322,7 +323,7 @@ const addCampaignGroupMember =
             const {userId} = req;
             throwUserNotAuthorized(req);
             const campaignRequest: CampaignRequestModel | null =
-                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)}).exec();
             throwCampaignNotFoundError(campaignRequest);
             if (campaignRequest && userId) {
                 // creator cant be the joined member of campaign
@@ -337,7 +338,7 @@ const addCampaignGroupMember =
 
                 // push the userId of joined members
                 campaignRequest.groupMemberIds = [...groupMemberIds, userId];
-                const user: UserModel | null = await User.findOne({_id: userId});
+                const user: UserModel | null = await User.findOne({_id: userId}).exec();
                 throwUserNotFoundError(user);
                 if (user) {
                     // update the joined member the campaign he/she joined
@@ -367,7 +368,7 @@ const postCampaignCompletionDescription =
             throwUserNotAuthorized(req);
 
             const campaignRequest: CampaignRequestModel | null =
-                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)}).exec();
             throwCampaignNotFoundError(campaignRequest);
             // check is the campaign creator allowed
             if (campaignRequest && userId && campaignRequest.creatorId.toString() === userId.toString()) {
@@ -404,7 +405,7 @@ const getUserData = async (args: any, req: IRequest) => {
     try {
         const {userId} = req;
 
-        const user: UserModel | null = await User.findOne({_id: userId});
+        const user: UserModel | null = await User.findOne({_id: userId}).exec();
         throwUserNotFoundError(user);
         if (user) {
             // TODO add populate
@@ -421,7 +422,7 @@ const getRequestedCampaign =
         try {
             throwUserNotAuthorized(req);
             const campaignRequest: CampaignRequestModel | null =
-                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)});
+                await CampaignRequest.findOne({_id: Types.ObjectId(campaignRequestId)}).exec();
             throwCampaignNotFoundError(campaignRequest);
 
             if (campaignRequest) {

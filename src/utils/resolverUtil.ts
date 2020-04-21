@@ -86,7 +86,7 @@ export const getCampaignStatus = (campaignRequest: CampaignRequestModel): string
 }
 
 export const updateUserProperty = async (property = {}, userId: Types.ObjectId | undefined, isOldValueRequired = false) => {
-    const user: UserModel | null = await User.findOne({_id: userId});
+    const user: UserModel | null = await User.findOne({_id: userId}).exec();
     throwUserNotFoundError(user);
     // @ts-ignore
     if (user) {
@@ -141,3 +141,37 @@ export const getUpdatedUserResponse = (user: UserModel) => {
 export const isUserAlreadyJoined = (userIds: Types.ObjectId[], newUserId: Types.ObjectId) => {
     return userIds.find((userId: Types.ObjectId) => userId.toString() === newUserId.toString());
 };
+
+// campaignRequestIds: [Types.ObjectId];
+// joinedCampaignIds: [Types.ObjectId];
+// donationHistory: IDonationHistory[];
+
+export const setUserPopulate = async (user: UserModel) => {
+    if(user.campaignRequestIds.length > 0) {
+        await user.populate('campaignRequestIds').execPopulate();
+    }
+    if(user.joinedCampaignIds.length > 0) {
+        await user.populate('joinedCampaignIds').execPopulate();
+    }
+    if(user.donationHistory.length > 0) {
+        await user.populate('donationHistory').execPopulate();
+    }
+    return user;
+}
+
+// creatorId: Types.ObjectId;
+// donerIds: Types.ObjectId[];
+// groupMemberIds: Types.ObjectId[];
+
+export const setCampaignPopulate = async (campaign: CampaignRequestModel) => {
+    if(campaign.creatorId) {
+        await campaign.populate('creatorId').execPopulate();
+    }
+    if(campaign.donerIds.length > 0) {
+        await campaign.populate('donerIds').execPopulate();
+    }
+    if(campaign.groupMemberIds.length > 0) {
+        await campaign.populate('groupMemberIds').execPopulate();
+    }
+    return campaign;
+}

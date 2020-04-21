@@ -16,19 +16,21 @@ export type UserModel = Document & {
     DOB: string;
     contactNumber: string;
     rewardPoints: number;
-    campaignRequestIds: [Types.ObjectId];
-    joinedCampaignIds: [Types.ObjectId];
+    campaignRequestIds: Types.ObjectId[];
+    joinedCampaignIds: Types.ObjectId[];
     donationHistory: IDonationHistory[];
     maxDistance: number;
     createdAt: string;
     updatedAt: string;
 };
 
+const campaignRef = {
+    type: Schema.Types.ObjectId,
+    ref: 'CampaignRequest',
+};
+
 const donationHistory = {
-    campaignRequestId: {
-        type: Schema.Types.ObjectId,
-        ref: 'CampaignRequest',
-    },
+    campaignRequestId: campaignRef,
     donationAmount: {
         type: Number,
         required: true,
@@ -77,13 +79,11 @@ const userSchema: Schema = new Schema({
         default: 0,
     },
     campaignRequestIds: {
-        type: [Schema.Types.ObjectId],
-        ref: 'CampaignRequest',
+        type: [campaignRef],
         default: [],
     },
     joinedCampaignIds: {
-        type: [Schema.Types.ObjectId],
-        ref: 'CampaignRequest',
+        type: [campaignRef],
         default: [],
     },
     donationHistory: {

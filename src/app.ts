@@ -54,6 +54,7 @@ app.use(
         rootValue: resolver,
         graphiql: true,
         formatError(err: Error) {
+            // tslint:disable-next-line:no-console
             console.log(err, 'error##');
             if (!err.originalError) {
                 return err;
