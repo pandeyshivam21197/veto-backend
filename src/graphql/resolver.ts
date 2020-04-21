@@ -181,6 +181,7 @@ const postCampaign =
                 const updatedCampaign = await createdRequest.save();
                 // populates the creator id
                 await updatedCampaign.populate('creatorId').execPopulate();
+                // TODO add populate
 
                 return getUpdatedCampaignResponse(updatedCampaign);
             }
@@ -210,6 +211,7 @@ const postCampaignEntity =
 
                     campaignRequest.entities = newEntities;
                     const updatedCampaign = await campaignRequest.save();
+                    // TODO add populate
 
                     return getUpdatedCampaignResponse(updatedCampaign);
                 }
@@ -261,6 +263,7 @@ const postCampaignDonation =
                     // Sets campaign status if done
                     campaignRequest.status = getCampaignStatus(campaignRequest);
                     const updatedCampaign = await campaignRequest.save();
+                    // TODO add populate
 
                     return getUpdatedCampaignResponse(updatedCampaign);
                 }
@@ -274,6 +277,8 @@ const postUserRewards = async ({points}: IPostUserRewards, req: IRequest): Promi
     const {userId} = req;
     try {
         throwUserNotAuthorized(req);
+        // TODO add populate
+
         return await updateUserProperty({rewardPoints: points}, userId, true);
     } catch (e) {
         error(e.message, e.code, e.data);
@@ -290,6 +295,8 @@ const postCampaignThumbnails = async ({campaignRequestId, thumbnails}: IPostCamp
         if (campaignRequest) {
             campaignRequest.thumbnails = setThumbnailsType(campaignRequest.thumbnails, thumbnails);
             const updatedCampaign = await campaignRequest.save();
+            // TODO add populate
+
 
             return getUpdatedCampaignResponse(updatedCampaign);
         }
@@ -338,8 +345,9 @@ const addCampaignGroupMember =
                     await user.save();
                 }
                 const updatedCampaign = await campaignRequest.save();
+                // TODO add populate
+
                 await updatedCampaign.populate('groupMemberIds').execPopulate();
-                console.log(updatedCampaign, 'updatedCampaign$$$');
 
                 return getUpdatedCampaignResponse(updatedCampaign);
             }
@@ -367,6 +375,7 @@ const postCampaignCompletionDescription =
                 campaignRequest.description = description;
 
                 const updatedCampaign = await campaignRequest.save();
+                // TODO add populate
                 await updatedCampaign.populate('groupMemberIds').execPopulate();
 
                 return getUpdatedCampaignResponse(updatedCampaign);
@@ -417,6 +426,7 @@ const getRequestedCampaign =
 
             if (campaignRequest) {
                 const updatedCampaign = await campaignRequest.save();
+                // TODO add populate
 
                 return getUpdatedCampaignResponse(updatedCampaign);
             }
