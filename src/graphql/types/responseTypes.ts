@@ -16,7 +16,9 @@ type Entity {
     title: String!
     requestedAmount: Int!
     availedAmount: Int!
+    unitType: String!
     currentPrice: String!
+    currency: String!
     status: String!
     }
 `;

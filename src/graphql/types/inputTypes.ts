@@ -16,7 +16,8 @@ const EntityInput: string = `
 input EntityInput {
     title: String!
     requestedAmount: Int!
-    availedAmount: Int
+    unitType: String!
+    currency: String!
     currentPrice: String!
     status: String
     }

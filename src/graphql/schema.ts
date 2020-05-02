@@ -41,11 +41,12 @@ password: String!
     postUserMaxDistance(distance: Int!): User!
     getRequestedCampaign(campaignRequestId: String!): CampaignRequest!
     getCampaignRequests(page: Int!): [CampaignRequest]!
-
+    getNearestCampaignRequests(location: String!): [CampaignRequest]!
     }
 
     type RootQuery {
     getUserData: User!
+    getAuthConfirmation: Boolean!
     }
 
 schema {

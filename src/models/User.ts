@@ -54,7 +54,7 @@ const userSchema: Schema = new Schema({
         type: String,
         require: true,
     },
-    location: {
+    location: { // location of the user
         type: String,
         required: true,
     },
@@ -74,23 +74,23 @@ const userSchema: Schema = new Schema({
         type: String,
         required: true,
     },
-    rewardPoints: {
+    rewardPoints: { // On donatin or successful campaign he gets rewards
         type: Number,
         default: 0,
     },
-    campaignRequestIds: {
+    campaignRequestIds: { // campaign request hosted by the user.
         type: [campaignRef],
         default: [],
     },
-    joinedCampaignIds: {
+    joinedCampaignIds: { // Other Campaigns user part of.
         type: [campaignRef],
         default: [],
     },
-    donationHistory: {
+    donationHistory: { // Donation history of doner
         type: [donationHistory],
         default: [],
     },
-    maxDistance: {
+    maxDistance: { // this is for Distributor, how much he is willing to travel
         type: Number,
         default: 0,
     },

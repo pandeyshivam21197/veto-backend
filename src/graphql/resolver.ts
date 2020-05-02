@@ -85,6 +85,10 @@ interface IPostCampaignThumbnails extends IThumbnails, ICampaignRequestId {
 
 const pageLimit: number = 10;
 
+const getAuthConfirmation = (args: any, req: IRequest): boolean => {
+    return req.isAuth ? req.isAuth : false;
+}
+
 const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
     try {
         const {username, name, password, email, location, idProofImageUrl, idProofType, DOB, contactNumber} = userInput;
@@ -387,6 +391,7 @@ const getCampaignRequests = async ({page}: { page: number }, req: IRequest) => {
         throwUserNotAuthorized(req);
         return await CampaignRequest
             .aggregate([
+                {$match: {status: campaignRequestStatus.COMPLETED}},
                 {$sort: {createdAt: -1}},
                 {$skip: skipNumber},
                 {$limit: pageLimit},
@@ -442,7 +447,27 @@ const getRequestedCampaign =
         }
     };
 
+    const getNearestCampaignRequests = async ({location}: {location: string}, req: IRequest) => {
+        // TODO: add google location
+        // TODO: in that location get all campaign with distance sent by doner and is accepted to the request.
+        try{
+            throwUserNotAuthorized(req);
+            const campaignRequest: CampaignRequestModel | null = await CampaignRequest.find({})
+
+        } catch(e) {
+            error(e.message, e.code, e.data);
+        }
+    }
+
+    // 1) Rest api to push image and video.
+    
+
+    // Note - in doners (default 30km) area with distance (30km default) all the campaign will be shown.
+    // for distributor he sees his campaigns first (from user data) then other campaings he joined(user data). Button to host a new Campaign.
+    // in home page user sees Completed 1) campaigns in his area then 2) campaigns in 
+
 const resolver = {
+    getAuthConfirmation,
     singIn,
     login,
     postCampaign,

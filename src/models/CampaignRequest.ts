@@ -74,9 +74,17 @@ const entity = {
         type: Number,
         default: 0,
     },
+    unitType: {
+        type: String,
+        required: true,
+    },
     currentPrice: {
         type: String,
         required: true,
+    },
+    currency: {
+        type: String,
+        default: 'INR',
     },
     status: {
         type: String,
@@ -98,7 +106,7 @@ const campaignRequestSchema: Schema = new Schema({
         type: String,
         default: '',
     },
-    entities: {
+    entities: { // This required in this campaign 
         type: [entity],
         default: [],
     },
@@ -106,15 +114,15 @@ const campaignRequestSchema: Schema = new Schema({
         type: String,
         default: campaignRequestStatus.INITIATED,
     },
-    creatorId: {
+    creatorId: { // creator
         type: Schema.Types.ObjectId,
         ref: 'User',
     },
-    donerIds: {
+    donerIds: { // people who donated for this campaign
         type: [userRef],
         default: [],
     },
-    groupMemberIds: {
+    groupMemberIds: { // other people who joined the campaign
         type: [userRef],
         default: [],
     },
@@ -122,7 +130,7 @@ const campaignRequestSchema: Schema = new Schema({
         type: [thumbnail],
         default: [],
     },
-    description: {
+    description: { // this get set by the creator when the campaign gets over
         type: String,
         default: '',
     },
