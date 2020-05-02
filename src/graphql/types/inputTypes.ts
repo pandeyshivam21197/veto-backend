@@ -9,6 +9,7 @@ input UserInput {
     contactNumber: String!
     idProofImageUrl: String!
     DOB: String!
+    userImage: String
 }
 `;
 

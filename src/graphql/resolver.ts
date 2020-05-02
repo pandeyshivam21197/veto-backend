@@ -91,7 +91,7 @@ const getAuthConfirmation = (args: any, req: IRequest): boolean => {
 
 const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
     try {
-        const {username, name, password, email, location, idProofImageUrl, idProofType, DOB, contactNumber} = userInput;
+        const {username, name, password, email, location, idProofImageUrl, idProofType, DOB, contactNumber, userImage} = userInput;
         const encodedPassword = await bcrypt.hash(password, 12);
         const errors: IMessage[] = [];
 
@@ -125,6 +125,7 @@ const singIn = async ({userInput}: ISingIn): Promise<UserModel | undefined> => {
                 idProofType,
                 DOB,
                 contactNumber,
+                userImage,
             },
         );
         await user.save();
@@ -460,6 +461,7 @@ const getRequestedCampaign =
     }
 
     // 1) Rest api to push image and video.
+    // 1) Rest api to user image and set user image graph ql image url
     
 
     // Note - in doners (default 30km) area with distance (30km default) all the campaign will be shown.

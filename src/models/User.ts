@@ -20,6 +20,7 @@ export type UserModel = Document & {
     joinedCampaignIds: Types.ObjectId[];
     donationHistory: IDonationHistory[];
     maxDistance: number;
+    userImage: string;
     createdAt: string;
     updatedAt: string;
 };
@@ -94,6 +95,10 @@ const userSchema: Schema = new Schema({
         type: Number,
         default: 0,
     },
+    userImage: {
+        type: String,
+        default: '',
+    }
 }, {timestamps: true});
 
 const User = model<UserModel>('User', userSchema);

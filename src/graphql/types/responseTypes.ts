@@ -58,6 +58,7 @@ type User {
     joinedCampaignIds: [CampaignRequest]!
     donationHistory: [DonationHistory]!
     maxDistance: Int!
+    userImage: String!
     ${timeStamp}
 }
 `;
