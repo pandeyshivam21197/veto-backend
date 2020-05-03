@@ -1,5 +1,5 @@
 import {config} from 'dotenv';
-import express, {ErrorRequestHandler, NextFunction, Request, Response} from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 // @ts-ignore
 import GraphHTTP from 'express-graphql';
 
@@ -29,6 +29,7 @@ const app = express();
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json()); // application/json
+app.use('/images', express.static(__dirname + 'images'));
 
 
 app.use((req: Request, res: Response, next: NextFunction) => {

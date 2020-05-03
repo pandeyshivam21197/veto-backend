@@ -8,9 +8,9 @@ import CampaignRequest, {
     IThumbnail,
     thumbnailType,
 } from '@Models/CampaignRequest';
-import User, {UserModel} from '@Models/User';
-import {campaignRequestError, error, throwUserNotFoundError} from '@Utils/errorUtil';
-import {Types} from 'mongoose';
+import User, { UserModel } from '@Models/User';
+import { campaignRequestError, error, throwUserNotFoundError } from '@Utils/errorUtil';
+import { Types } from 'mongoose';
 
 export const isEntitiesValid = (entities: IEntity[]): boolean => {
     let isValid: boolean = true;
@@ -42,20 +42,20 @@ export const getUpdatedEntities = (oldEntities: IEntity[], newEntities: IEntity[
 };
 
 export const updateEntityAmount = (donationEntity: IDonationEntity, entities: IEntity[]): IEntity[] => {
-    const {title, amount} = donationEntity;
+    const { title, amount } = donationEntity;
     const foundIndex: number = entities.findIndex((entity: IEntity) => {
         return entity.title.trim().toLowerCase() === title.trim().toLowerCase();
     });
     if (foundIndex > -1) {
         // @ts-ignore
         const foundEntity: IEntity = entities[foundIndex]._doc;
-        const {availedAmount, requestedAmount, status} = foundEntity;
+        const { availedAmount, requestedAmount, status } = foundEntity;
         // check if its already availed or not
         if (availedAmount === requestedAmount || status === entityStatus.AVAILED) {
-            error(campaignRequestError.BAD_REQUEST, 403, {message: `entity ${title} is already availed.`});
+            error(campaignRequestError.BAD_REQUEST, 403, { message: `entity ${title} is already availed.` });
         }
         // set availed amount
-        const updatedEntity: IEntity = {...foundEntity, availedAmount: availedAmount + amount};
+        const updatedEntity: IEntity = { ...foundEntity, availedAmount: availedAmount + amount };
         // after setting entity availed again is it now availed or not
         if (updatedEntity.availedAmount === updatedEntity.requestedAmount) {
             updatedEntity.status = entityStatus.AVAILED;
@@ -79,14 +79,14 @@ export const setThumbnailsType = (oldThumbnails: IThumbnail[], newThumbnails: IT
 };
 
 export const getCampaignStatus = (campaignRequest: CampaignRequestModel): string => {
-    const {entities, status} = campaignRequest;
+    const { entities, status } = campaignRequest;
     const isAllEntitiesAvailed: boolean = entities.every((entity: IEntity) => entity.status === entityStatus.AVAILED);
 
     return isAllEntitiesAvailed ? campaignRequestStatus.AVAILED : status;
 }
 
 export const updateUserProperty = async (property = {}, userId: Types.ObjectId | undefined, isOldValueRequired = false) => {
-    const user: UserModel | null = await User.findOne({_id: userId}).exec();
+    const user: UserModel | null = await User.findOne({ _id: userId }).exec();
     throwUserNotFoundError(user);
     // @ts-ignore
     if (user) {
@@ -103,7 +103,7 @@ export const updateUserProperty = async (property = {}, userId: Types.ObjectId |
         user[key] = value;
         const updatedUser = await user.save();
 
-        const {createdAt, updatedAt, _id} = await setUserPopulate(updatedUser);
+        const { createdAt, updatedAt, _id } = await setUserPopulate(updatedUser);
 
         return {
             // @ts-ignore
@@ -116,7 +116,7 @@ export const updateUserProperty = async (property = {}, userId: Types.ObjectId |
 }
 
 export const getUpdatedCampaignResponse = async (campaignRequest: CampaignRequestModel) => {
-    const {createdAt, updatedAt, _id} = campaignRequest;
+    const { createdAt, updatedAt, _id } = campaignRequest;
 
     return {
         // @ts-ignore
@@ -128,7 +128,7 @@ export const getUpdatedCampaignResponse = async (campaignRequest: CampaignReques
 };
 
 export const getUpdatedUserResponse = (user: UserModel) => {
-    const {createdAt, updatedAt, _id} = user;
+    const { createdAt, updatedAt, _id } = user;
 
     return {
         // @ts-ignore
@@ -146,16 +146,42 @@ export const isUserAlreadyJoined = (userIds: Types.ObjectId[], newUserId: Types.
 // campaignRequestIds: [Types.ObjectId];
 // joinedCampaignIds: [Types.ObjectId];
 // donationHistory: IDonationHistory[];
+const deepUserPopulation = {
+    populate: [{
+        path: 'creatorId',
+        model: 'User'
+    },
+    {
+        path: 'donerIds',
+        model: 'User'
+    },
+    {
+        path: 'groupMemberIds',
+        model: 'User'
+    }],
+}
 
 export const setUserPopulate = async (user: UserModel) => {
-    if(user.campaignRequestIds.length > 0) {
-        await user.populate('campaignRequestIds').execPopulate();
+    if (user.campaignRequestIds.length > 0) {
+        await user.populate({
+            path: 'campaignRequestIds',
+            model: 'CampaignRequest',
+            ...deepUserPopulation
+        }).execPopulate();
     }
-    if(user.joinedCampaignIds.length > 0) {
-        await user.populate('joinedCampaignIds').execPopulate();
+    if (user.joinedCampaignIds.length > 0) {
+        await user.populate({
+            path: 'joinedCampaignIds',
+            model: 'CampaignRequest',
+            ...deepUserPopulation
+        }).execPopulate();
     }
-    if(user.donationHistory.length > 0) {
-        await user.populate('donationHistory').execPopulate();
+    if (user.donationHistory.length > 0) {
+        await user.populate({
+            path: 'donationHistory.campaignRequestId',
+            model: 'CampaignRequest',
+            ...deepUserPopulation
+        }).execPopulate();
     }
     return user;
 }
@@ -165,13 +191,13 @@ export const setUserPopulate = async (user: UserModel) => {
 // groupMemberIds: Types.ObjectId[];
 
 export const setCampaignPopulate = async (campaign: CampaignRequestModel) => {
-    if(campaign.creatorId) {
+    if (campaign.creatorId) {
         await campaign.populate('creatorId').execPopulate();
     }
-    if(campaign.donerIds.length > 0) {
+    if (campaign.donerIds.length > 0) {
         await campaign.populate('donerIds').execPopulate();
     }
-    if(campaign.groupMemberIds.length > 0) {
+    if (campaign.groupMemberIds.length > 0) {
         await campaign.populate('groupMemberIds').execPopulate();
     }
     return campaign;

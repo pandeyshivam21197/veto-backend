@@ -416,8 +416,8 @@ const getCampaignRequests = async ({page}: { page: number }, req: IRequest) => {
 
 const getUserData = async (args: any, req: IRequest) => {
     try {
+        throwUserNotAuthorized(req);
         const {userId} = req;
-
         const user: UserModel | null = await User.findOne({_id: userId}).exec();
         throwUserNotFoundError(user);
         if (user) {
