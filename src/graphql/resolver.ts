@@ -462,11 +462,11 @@ const getRequestedCampaign =
 
     // 1) Rest api to push image and video.
     // 1) Rest api to user image and set user image graph ql image url
-    
+
 
     // Note - in doners (default 30km) area with distance (30km default) all the campaign will be shown.
     // for distributor he sees his campaigns first (from user data) then other campaings he joined(user data). Button to host a new Campaign.
-    // in home page user sees Completed 1) campaigns in his area then 2) campaigns in 
+    // in home page user sees Completed 1) campaigns in his area then 2) campaigns in
 
 const resolver = {
     getAuthConfirmation,

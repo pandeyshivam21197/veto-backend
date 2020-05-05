@@ -98,7 +98,7 @@ const userSchema: Schema = new Schema({
     userImage: {
         type: String,
         default: '',
-    }
+    },
 }, {timestamps: true});
 
 const User = model<UserModel>('User', userSchema);

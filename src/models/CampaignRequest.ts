@@ -106,7 +106,7 @@ const campaignRequestSchema: Schema = new Schema({
         type: String,
         default: '',
     },
-    entities: { // This required in this campaign 
+    entities: { // This required in this campaign
         type: [entity],
         default: [],
     },

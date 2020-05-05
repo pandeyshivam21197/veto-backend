@@ -149,15 +149,15 @@ export const isUserAlreadyJoined = (userIds: Types.ObjectId[], newUserId: Types.
 const deepUserPopulation = {
     populate: [{
         path: 'creatorId',
-        model: 'User'
+        model: 'User',
     },
     {
         path: 'donerIds',
-        model: 'User'
+        model: 'User',
     },
     {
         path: 'groupMemberIds',
-        model: 'User'
+        model: 'User',
     }],
 }
 
@@ -166,21 +166,21 @@ export const setUserPopulate = async (user: UserModel) => {
         await user.populate({
             path: 'campaignRequestIds',
             model: 'CampaignRequest',
-            ...deepUserPopulation
+            ...deepUserPopulation,
         }).execPopulate();
     }
     if (user.joinedCampaignIds.length > 0) {
         await user.populate({
             path: 'joinedCampaignIds',
             model: 'CampaignRequest',
-            ...deepUserPopulation
+            ...deepUserPopulation,
         }).execPopulate();
     }
     if (user.donationHistory.length > 0) {
         await user.populate({
             path: 'donationHistory.campaignRequestId',
             model: 'CampaignRequest',
-            ...deepUserPopulation
+            ...deepUserPopulation,
         }).execPopulate();
     }
     return user;
