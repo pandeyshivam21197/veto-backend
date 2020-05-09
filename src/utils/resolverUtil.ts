@@ -166,6 +166,7 @@ export const setUserPopulate = async (user: UserModel) => {
         await user.populate({
             path: 'campaignRequestIds',
             model: 'CampaignRequest',
+            options: { sort: { 'campaignRequestIds.createdAt': -1 } },
             ...deepUserPopulation,
         }).execPopulate();
     }
@@ -173,6 +174,7 @@ export const setUserPopulate = async (user: UserModel) => {
         await user.populate({
             path: 'joinedCampaignIds',
             model: 'CampaignRequest',
+            options: { sort: { 'joinedCampaignIds.createdAt': -1 } },
             ...deepUserPopulation,
         }).execPopulate();
     }
@@ -201,4 +203,15 @@ export const setCampaignPopulate = async (campaign: CampaignRequestModel) => {
         await campaign.populate('groupMemberIds').execPopulate();
     }
     return campaign;
+}
+
+export const setUserFields = (fields: Array<Object>, user: UserModel) => {
+    fields.forEach((element: any) => {
+        const key = Object.keys(element)[0];
+        if(element && element[key]) {
+            //@ts-ignore
+            user[key] = element[key];
+        }
+    })
+    return user;
 }

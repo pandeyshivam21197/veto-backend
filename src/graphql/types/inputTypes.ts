@@ -12,6 +12,22 @@ input UserInput {
     userImage: String
 }
 `;
+const UserPatchInput: string = `
+input UserPatchInput {
+    name: String
+    username: String
+    email: String
+    oldPassword: String
+    newPassword: String
+    location: String
+    idProofType: String
+    idProofImageUrl: String
+    maxDistance: Int
+    contactNumber: String
+    DOB: String
+    userImage: String
+}
+`;
 
 const EntityInput: string = `
 input EntityInput {
@@ -47,6 +63,6 @@ input ThumbnailsInput{
     }
 `;
 
-const inputTypes = {UserInput, RequestInput, EntityInput, DonationEntityInput, ThumbnailsInput};
+const inputTypes = {UserInput, RequestInput, EntityInput, DonationEntityInput, ThumbnailsInput, UserPatchInput};
 
 export default inputTypes;

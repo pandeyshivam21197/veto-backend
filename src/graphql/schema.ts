@@ -2,7 +2,7 @@ import inputTypes from '@Graphql/types/inputTypes';
 import responseTypes from '@Graphql/types/responseTypes';
 import {buildSchema, GraphQLSchema} from 'graphql';
 
-const {UserInput, RequestInput, EntityInput, DonationEntityInput, ThumbnailsInput} = inputTypes;
+const {UserInput, RequestInput, EntityInput, DonationEntityInput, ThumbnailsInput, UserPatchInput} = inputTypes;
 const {CampaignRequest, User, DonationHistory, Entity, ThumbnailsType} = responseTypes;
 
 // post Schema - create the data and post to data base (POST, PUT , DELETE, PATCH)
@@ -17,6 +17,7 @@ ${User}
 ${EntityInput}
 ${RequestInput}
 ${DonationEntityInput}
+${UserPatchInput}
 
 type AuthResponse {
 token: String!
@@ -41,7 +42,8 @@ password: String!
     postUserMaxDistance(distance: Int!): User!
     getRequestedCampaign(campaignRequestId: String!): CampaignRequest!
     getCampaignRequests(page: Int!): [CampaignRequest]!
-    getNearestCampaignRequests(location: String!): [CampaignRequest]!
+    getNearestDonationCampaign(location: String!, distance: Int): [CampaignRequest]!
+    patchUserData(userInput: UserPatchInput!): User!
     }
 
     type RootQuery {

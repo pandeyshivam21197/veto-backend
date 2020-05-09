@@ -13,8 +13,9 @@ export const userErrors = {
     USER_ALREADY_EXISTED: 'User already exist.',
     USER_CANT_BE_MEMBER: 'User cant be the member of its own campaign.',
     USR_NOT_AUTHORIZED: 'User is not authorized',
-    INCORRECT_PASSWORD: 'Password is incorrect.',
     SECRET_KEY_ERROR: 'Secret key not found.',
+    INCORRECT_PASSWORD: 'Password is incorrect.',
+    INCORRECT_OLD_PASSWORD: 'Old Password is incorrect.',
     BAD_REQUEST: 'Bad request.',
     REQUEST_NOT_FOUND: 'Requested data not found. Please check params.',
     INVALID_EMAIL: 'Please provide proper email address',
@@ -24,6 +25,10 @@ export const userErrors = {
 export const campaignRequestError = {
     BAD_REQUEST: 'Unable to set, please check params',
     INVALID_PAGE_NO: 'Invalid page no, should be more than 0',
+}
+
+export const requestErrros = {
+    EMPTY_INPUT: 'The payload input is empty.'
 }
 
 export interface ErrorType extends Error {
