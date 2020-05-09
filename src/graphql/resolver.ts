@@ -489,9 +489,8 @@ const getNearestDonationCampaign = async ({ location, distance }: INearestDonati
                     { $match: { 'creatorId.maxDistance': { $lt: donationDistance } } }
                 ])
 
-        console.log(campaignRequests, 'campaignRequests');
         if (!campaignRequests || (campaignRequests && campaignRequests.length <= 0)) {
-            error('no data present', 500);
+            error(campaignRequestError.NO_CAMPAIGN_REQUEST_FOUND, 503);
         }
 
         return campaignRequests;
