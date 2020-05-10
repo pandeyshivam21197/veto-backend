@@ -484,9 +484,20 @@ const getNearestDonationCampaign = async ({ location, distance }: INearestDonati
         const campaignRequests: CampaignRequestModel[] | null =
             await CampaignRequest
                 .aggregate([
+                    { $match: { 'status': { $ne: campaignRequestStatus.COMPLETED } } },
                     { $lookup: { from: User.collection.name, localField: 'creatorId', foreignField: '_id', as: 'creatorId' } },
                     { $set: { creatorId: { $arrayElemAt: ['$creatorId', 0] } } },
-                    { $match: { 'creatorId.maxDistance': { $lt: donationDistance } } }
+                    { $match: { 'creatorId.maxDistance': { $lt: donationDistance } } },
+                    { $lookup: { from: User.collection.name, localField: 'donerIds', foreignField: '_id', as: 'donerIds' } },
+                    {
+                        $lookup: {
+                            from: User.collection.name,
+                            localField: 'groupMemberIds',
+                            foreignField: '_id',
+                            as: 'groupMemberIds',
+                        },
+                    },
+                    { $sort: { 'creatorId.maxDistance': 1 } }
                 ])
 
         if (!campaignRequests || (campaignRequests && campaignRequests.length <= 0)) {
