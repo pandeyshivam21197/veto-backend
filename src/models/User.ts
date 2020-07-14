@@ -5,6 +5,25 @@ interface IDonationHistory {
     donationAmount: number;
 }
 
+//     name: string; // normal user or party admin or party member
+//     username: string;
+//     email: string;
+//     password: string;
+//     location: string;
+//     DOB: string;
+//     contactNumber: string;
+//     userImage: string;
+//     complaints: [refs] new model => complaint status n all (on already schemes) complaints <=> scheme/policies: {comments: []}
+//     proposals: [refs] => proposal of new scheme which is not taken in account. proposals <=> party model
+//     isPartyAdmin: boolean;
+//     partyDetails: ref(party model); // party model => list of all members  (manifesto(ref), scheme/policies(refs))
+//     partyMemberDetails: {} (portfolio (ref))
+
+
+
+
+
+
 export type UserModel = Document & {
     name: string;
     username: string;
@@ -25,18 +44,15 @@ export type UserModel = Document & {
     updatedAt: string;
 };
 
-const campaignRef = {
+const proposalRef = {
     type: Schema.Types.ObjectId,
-    ref: 'CampaignRequest',
+    ref: 'Proposal',
 };
 
-const donationHistory = {
-    campaignRequestId: campaignRef,
-    donationAmount: {
-        type: Number,
-        required: true,
-    },
-};
+const complaintRef = {
+    type: Schema.Types.ObjectId,
+    ref: 'Campaign'
+}
 
 const userSchema: Schema = new Schema({
     name: {
@@ -59,14 +75,6 @@ const userSchema: Schema = new Schema({
         type: String,
         required: true,
     },
-    idProofType: {
-        type: String,
-        required: true,
-    },
-    idProofImageUrl: {
-        type: String,
-        required: true,
-    },
     DOB: {
         type: String,
         required: true,
@@ -75,31 +83,37 @@ const userSchema: Schema = new Schema({
         type: String,
         required: true,
     },
-    rewardPoints: { // On donatin or successful campaign he gets rewards
-        type: Number,
-        default: 0,
-    },
-    campaignRequestIds: { // campaign request hosted by the user.
-        type: [campaignRef],
-        default: [],
-    },
-    joinedCampaignIds: { // Other Campaigns user part of.
-        type: [campaignRef],
-        default: [],
-    },
-    donationHistory: { // Donation history of doner
-        type: [donationHistory],
-        default: [],
-    },
-    maxDistance: { // this is for Distributor, how much he is willing to travel
-        type: Number,
-        default: 0,
-    },
     userImage: {
         type: String,
         default: '',
     },
-}, {timestamps: true});
+    complaints: {
+        type: [complaintRef],
+        default: []
+    },
+    proposals: {
+        type: [proposalRef],
+        default: []
+    },
+    isPartyAdmin: {
+        type: Boolean,
+        default: false
+    },
+    partyDetails: { // 1) party member can add the person to party, once he adds partyDetails stores the ref of party
+        type: {
+            type: Schema.Types.ObjectId,
+            ref: 'Party'
+        },
+        default: null
+    },
+    partyMemberDetails: { // 2) once addded to party the person can fill the his required details and ther user ref stored in party model
+        type: {
+            // education details. can add top degree photo.
+            // political career => biggest position till now and prev info
+        },
+        default: null
+    }
+});
 
 const User = model<UserModel>('User', userSchema);
 
