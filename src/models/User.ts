@@ -13,15 +13,11 @@ interface IDonationHistory {
 //     DOB: string;
 //     contactNumber: string;
 //     userImage: string;
-//     complaints: [refs] new model => complaint status n all (on already schemes) complaints <=> scheme/policies: {comments: []}
-//     proposals: [refs] => proposal of new scheme which is not taken in account. proposals <=> party model
+//                              policies: {comments: []}
+//     proposals(complaints): [refs] => proposal of new policy to their resp MLA policy <=> user(MLA) -> party can use any of the policy addressed by their MLA into theit manifesto. proposals(policies addr. by MLA) <=> party model
 //     isPartyAdmin: boolean;
 //     partyDetails: ref(party model); // party model => list of all members  (manifesto(ref), scheme/policies(refs))
-//     partyMemberDetails: {} (portfolio (ref))
-
-
-
-
+//     partyMemberDetails: {} (portfolio (ref)) => seeing member qulification and achivements and portfolio => users(voters) get broad view.
 
 
 export type UserModel = Document & {
@@ -46,13 +42,8 @@ export type UserModel = Document & {
 
 const proposalRef = {
     type: Schema.Types.ObjectId,
-    ref: 'Proposal',
+    ref: 'Policy',
 };
-
-const complaintRef = {
-    type: Schema.Types.ObjectId,
-    ref: 'Campaign'
-}
 
 const userSchema: Schema = new Schema({
     name: {
@@ -87,10 +78,6 @@ const userSchema: Schema = new Schema({
         type: String,
         default: '',
     },
-    complaints: {
-        type: [complaintRef],
-        default: []
-    },
     proposals: {
         type: [proposalRef],
         default: []
@@ -110,6 +97,8 @@ const userSchema: Schema = new Schema({
         type: {
             // education details. can add top degree photo.
             // political career => biggest position till now and prev info
+            // policies (proposal/complaints)
+            // portfolio
         },
         default: null
     }
