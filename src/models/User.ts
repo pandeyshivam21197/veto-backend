@@ -1,10 +1,5 @@
 import {Document, model, Schema, Types} from 'mongoose';
 
-interface IDonationHistory {
-    campaignRequestId: Types.ObjectId;
-    donationAmount: number;
-}
-
 //     name: string; // normal user or party admin or party member
 //     username: string;
 //     email: string;
@@ -19,6 +14,7 @@ interface IDonationHistory {
 //     partyDetails: ref(party model); // party model => list of all members  (manifesto(ref), scheme/policies(refs))
 //     partyMemberDetails: {} (portfolio (ref)) => seeing member qulification and achivements and portfolio => users(voters) get broad view.
 
+// Note - voter complaints are proposal, those proposal are the complaints sent to part member of that area (Policy)
 
 export type UserModel = Document & {
     name: string;
@@ -28,22 +24,63 @@ export type UserModel = Document & {
     location: string;
     idProofType: string;
     idProofImageUrl: string;
-    DOB: string;
+    born: {
+        dob: string,
+        place: string
+    },
+    sex: string,
+    maritalStatus: string,
+    spouse: string,
     contactNumber: string;
-    rewardPoints: number;
-    campaignRequestIds: Types.ObjectId[];
-    joinedCampaignIds: Types.ObjectId[];
-    donationHistory: IDonationHistory[];
-    maxDistance: number;
     userImage: string;
-    createdAt: string;
-    updatedAt: string;
+    proposals: Types.ObjectId[];
+    isPartyAdmin: boolean;
+    partyDetails: Types.ObjectId;
+    partyMemberDetails: {
+        educationDetails: {
+            institution: String,
+            degree: string,
+            marks: string,
+            year: string,
+            place: string,
+            image: string
+        },
+        politicalCareer: {
+            position: string,
+            description: string,
+            year: string,
+        },
+        complaints: Types.ObjectId[],
+        portfolio: Types.ObjectId
+    }
 };
 
 const proposalRef = {
     type: Schema.Types.ObjectId,
     ref: 'Policy',
 };
+
+const complaintRef = {
+    type: Schema.Types.ObjectId,
+    ref: 'Policy'
+}
+
+const eductionType = {
+    institution: String,
+    degree: String,
+    marks: String,
+    year: String,
+    place: String,
+    image: {
+        type: String,
+    }
+}
+
+const politicalCareerType = {
+    position: String,
+    description: String,
+    year: String,
+}
 
 const userSchema: Schema = new Schema({
     name: {
@@ -66,9 +103,24 @@ const userSchema: Schema = new Schema({
         type: String,
         required: true,
     },
-    DOB: {
-        type: String,
+    born: {
+        type: {
+            dob: String,
+            place: String,
+        },
         required: true,
+    },
+    sex: {
+        type: String,
+        required: true
+    },
+    maritalStatus: {
+        type: String,
+        enum: ['Married', 'Unmarried'],
+        required: true
+    },
+    spouse: {
+        type: String,
     },
     contactNumber: {
         type: String,
@@ -76,31 +128,39 @@ const userSchema: Schema = new Schema({
     },
     userImage: {
         type: String,
-        default: '',
     },
     proposals: {
         type: [proposalRef],
-        default: []
     },
     isPartyAdmin: {
         type: Boolean,
-        default: false
     },
     partyDetails: { // 1) party member can add the person to party, once he adds partyDetails stores the ref of party
         type: {
             type: Schema.Types.ObjectId,
             ref: 'Party'
         },
-        default: null
     },
     partyMemberDetails: { // 2) once addded to party the person can fill the his required details and ther user ref stored in party model
         type: {
+            educationDetails: {
+                type: [eductionType],
+            },
+            politicalCareer: {
+                type: [politicalCareerType],
+            },
+            complaints: {
+                type: [complaintRef],
+            },
+            portfolio: {
+                type: Schema.Types.ObjectId,
+                ref: 'Portfolio'
+            }
             // education details. can add top degree photo.
             // political career => biggest position till now and prev info
             // policies (proposal/complaints)
             // portfolio
-        },
-        default: null
+        }
     }
 });
 
