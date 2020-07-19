@@ -2,22 +2,13 @@ import inputTypes from '@Graphql/types/inputTypes';
 import responseTypes from '@Graphql/types/responseTypes';
 import {buildSchema, GraphQLSchema} from 'graphql';
 
-const {UserInput, RequestInput, EntityInput, DonationEntityInput, ThumbnailsInput, UserPatchInput} = inputTypes;
-const {CampaignRequest, User, DonationHistory, Entity, ThumbnailsType} = responseTypes;
+const {UserInput} = inputTypes;
+const {User} = responseTypes;
 
 // post Schema - create the data and post to data base (POST, PUT , DELETE, PATCH)
 const source = `
-${Entity}
 ${UserInput}
-${ThumbnailsInput}
-${ThumbnailsType}
-${CampaignRequest}
-${DonationHistory}
 ${User}
-${EntityInput}
-${RequestInput}
-${DonationEntityInput}
-${UserPatchInput}
 
 type AuthResponse {
 token: String!
@@ -32,18 +23,6 @@ password: String!
  type RootMutation {
     singIn(userInput: UserInput!): User!
     login(loginInput: loginInput!): AuthResponse!
-    postCampaign(requestInput: RequestInput!): CampaignRequest!
-    postCampaignEntity(campaignRequestId: String!, entityInput: [EntityInput]!): CampaignRequest!
-    postCampaignDonation(campaignRequestId: String!, entity: DonationEntityInput!): CampaignRequest!
-    postCampaignThumbnails(campaignRequestId: String!, thumbnails: [ThumbnailsInput]!): CampaignRequest!
-    addCampaignGroupMember(campaignRequestId: String!): CampaignRequest!
-    postCampaignCompletionDescription(campaignRequestId: String!, description: String!): CampaignRequest!
-    postUserRewards(points: Int!): User!
-    postUserMaxDistance(distance: Int!): User!
-    getRequestedCampaign(campaignRequestId: String!): CampaignRequest!
-    getCampaignRequests(page: Int!): [CampaignRequest]!
-    getNearestDonationCampaign(location: String!, distance: Int): [CampaignRequest]!
-    patchUserData(userInput: UserPatchInput!): User!
     }
 
     type RootQuery {

@@ -3,44 +3,6 @@ const timeStamp: string = `
     updatedAt: String!
 `;
 
-// require CampaignRequest type
-const DonationHistory: string = `
-type DonationHistory {
-    campaignRequestId: CampaignRequest!
-    donationAmount: String!
-}
-`;
-
-const Entity: string = `
-type Entity {
-    title: String!
-    requestedAmount: Int!
-    availedAmount: Int!
-    unitType: String!
-    currentPrice: String!
-    currency: String!
-    status: String!
-    }
-`;
-
-// Requires entity Type and User Type
-const CampaignRequest: string = `
-type CampaignRequest {
-     _id: ID!
-    title: String!
-    subTitle: String!
-    entities: [Entity]!
-    status: String!
-    creatorId: User!
-    donerIds: [User]!
-    groupMemberIds: [User]!
-    thumbnails: [Thumbnails]!
-    description: String!
-    ${timeStamp}
-    }
-`;
-
-// Requires CampaignRequest Type and Donation History Type
 const User: string = `
 type User {
     _id: ID!
@@ -63,13 +25,6 @@ type User {
 }
 `;
 
-const ThumbnailsType: string = `
-type Thumbnails{
-    url: String!
-    type: String!
-    }
-`;
-
-const responseTypes = {User, CampaignRequest, DonationHistory, Entity, ThumbnailsType};
+const responseTypes = {User};
 
 export default responseTypes;
