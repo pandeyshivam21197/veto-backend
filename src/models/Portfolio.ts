@@ -7,7 +7,14 @@ const valueDenomination = {
 }
 
 export type portfolioModel = Document & {
-
+    assets: [{
+        value: string,
+        denomination: string
+    }];
+    liablities: {
+        value: string,
+        denomination: string
+    }
 }
 
 const portfolioSchema: Schema = new Schema({
@@ -15,10 +22,7 @@ const portfolioSchema: Schema = new Schema({
         type: [valueDenomination]
     },
     liablities: {
-        type: {
-            value: String,
-            denomintion: String
-        }
+        type: valueDenomination
     }
 })
 

@@ -38,7 +38,7 @@ export type UserModel = Document & {
     partyDetails: Types.ObjectId;
     partyMemberDetails: {
         educationDetails: {
-            institution: String,
+            institution: string,
             degree: string,
             marks: string,
             year: string,
