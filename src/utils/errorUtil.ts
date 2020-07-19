@@ -1,4 +1,3 @@
-import {CampaignRequestModel} from '@Models/CampaignRequest';
 import {UserModel} from '@Models/User';
 import {Request} from 'express';
 import {Types} from 'mongoose';
@@ -58,13 +57,13 @@ export const throwUserNotFoundError = (user: UserModel | null): void => {
     }
 }
 
-export const throwCampaignNotFoundError = (campaign: CampaignRequestModel | null): void => {
-    if (!campaign) {
-        const {BAD_REQUEST, REQUEST_NOT_FOUND} = userErrors;
-        error(BAD_REQUEST + REQUEST_NOT_FOUND, 400, {message: 'wrong campaignRequestId'});
-        return;
-    }
-};
+// export const throwCampaignNotFoundError = (campaign: CampaignRequestModel | null): void => {
+//     if (!campaign) {
+//         const {BAD_REQUEST, REQUEST_NOT_FOUND} = userErrors;
+//         error(BAD_REQUEST + REQUEST_NOT_FOUND, 400, {message: 'wrong campaignRequestId'});
+//         return;
+//     }
+// };
 
 export const throwUserNotAuthorized = (req: IRequest): void => {
     const {isAuth} = req;
