@@ -15,14 +15,14 @@ token: String!
 userId: String!
 }
 
-input loginInput {
+input LoginInput {
 email: String!
 password: String!
 }
 
  type RootMutation {
     singIn(userInput: UserInput!): User!
-    login(loginInput: loginInput!): AuthResponse!
+    login(loginInput: LoginInput!): AuthResponse!
     }
 
     type RootQuery {
