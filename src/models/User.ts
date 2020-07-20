@@ -28,9 +28,9 @@ export type UserModel = Document & {
         dob: string,
         place: string
     },
-    sex: string,
-    maritalStatus: string,
-    spouse: string,
+    sex: string;
+    maritalStatus: string;
+    spouse: string;
     contactNumber: string;
     userImage: string;
     proposals: Types.ObjectId[];
