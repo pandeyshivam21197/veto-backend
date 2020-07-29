@@ -13,7 +13,7 @@ import Auth from '@Middleware/Auth';
 import bodyParser from 'body-parser';
 
 const MONGODB_URI =
-    'mongodb+srv://shivam2:atria21197@cluster0-0drmr.mongodb.net/food?retryWrites=true&w=majority';
+    'mongodb+srv://shivam2:shivam21197@cluster0-0drmr.mongodb.net/food?retryWrites=true&w=majority';
 
 interface IMessage {
     message: string;
